@@ -19,7 +19,7 @@ public class Utils {
 
     /** Ubicacions de la grabacion */
     public static String getRecordingPath() {
-        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.path.getText() + File.separator +  "cap_" + Utils.getDateTime() + ".mp4";
+        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.path.getText().toString() + File.separator +  "cap_" + Utils.getDateTime() + ".mp4";
         // Quitar dobles slashes
         retValue = retValue.replace("//", "/");
         return retValue;
@@ -35,6 +35,15 @@ public class Utils {
             retValue.add(newInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT ? Constants.FRONT_CAM_NAME : Constants.BACK_CAM_NAME);
         }
         return retValue;
+    }
+
+    /** Existe una camara frontal? */
+    public static boolean existsFrontalCamera() {
+        for (String camera : getCameraList()) {
+            if (Constants.FRONT_CAM_NAME.equals(camera))
+                return true;
+        }
+        return false;
     }
 }
 

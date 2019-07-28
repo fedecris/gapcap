@@ -67,17 +67,17 @@
                 android:onClick="detener"
                 android:text="STOP" />
 
-            <TextView
-                android:id="@+id/textView3"
+            <Switch
+                android:id="@+id/switch_frontalCamera"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Camera" />
+                android:text="Front camera" />
 
-            <Spinner
-                android:id="@+id/spinner_cameras"
+            <Switch
+                android:id="@+id/switch_portrait"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="40dp" />
+                android:text="Portrait" />
 
             <Switch
                 android:id="@+id/switch_toBackground"
@@ -103,6 +103,15 @@
                 android:inputType="textPersonName"
                 android:text="/installer/Xtras/"
                 tools:targetApi="o" />
+
+            <EditText
+                android:id="@+id/editText_orientation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:ems="10"
+                android:inputType="number"
+                android:text="90" />
 
         </LinearLayout>
     </ScrollView>

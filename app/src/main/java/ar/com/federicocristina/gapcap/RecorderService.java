@@ -32,11 +32,13 @@ public class RecorderService extends Service {
     public void onCreate() {
         MainActivity.mRecordingStatus = false;
 
-        // Si se selecciono utilizar la camara frontal y se encontró
+        // Si se selecciono utilizar la camara frontal
         if (MainActivity.useFrontal)
             mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
         else
             mServiceCamera = Camera.open();
+
+//        mServiceCamera.setDisplayOrientation(Integer.parseInt(MainActivity.displayOrientation.getText().toString()));
 
         super.onCreate();
         if (MainActivity.mRecordingStatus == false)
@@ -74,6 +76,13 @@ public class RecorderService extends Service {
             Log.v(TAG, "use: width = " + mPreviewSize.width + " height = " + mPreviewSize.height);
             params.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
             params.setPreviewFormat(PixelFormat.YCbCr_420_SP);
+            if (MainActivity.usePortrait) {
+                params.set("orientation", "portrait");
+                params.set("rotation", "0");
+            } else {
+                params.set("orientation", "landscape");
+                params.set("rotation", "90");
+            }
             mServiceCamera.setParameters(params);
 
             try {
