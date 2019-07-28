@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback {
@@ -33,9 +35,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Estado de grabacion
     TextView status;
     // Ejecutar en background?
-    CheckBox runInBackground;
+    Switch runInBackground;
     // Usar camara frontal?
-    CheckBox useFrontalCam;
+    Switch useFrontalCam;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +53,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         // Recuperar componentes status
         status = findViewById(R.id.textView_status);
         status.setText(mRecordingStatus ? "Activo" : "Inactivo");
-        runInBackground = findViewById(R.id.checkBox_background);
+        runInBackground = findViewById(R.id.switch_toBackground);
         runInBackground.setChecked(toBackground);
-        useFrontalCam = findViewById(R.id.checkBox_frontal);
+        useFrontalCam = findViewById(R.id.switch_useFrontal);
         useFrontalCam.setChecked(useFrontal);
         path = findViewById(R.id.editText_path);
+
+        ((Button)findViewById(R.id.button_startService)).requestFocus();
     }
 
     public void iniciar(View v) {
