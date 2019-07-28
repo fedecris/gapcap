@@ -8,11 +8,15 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback {
 
@@ -36,8 +40,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     TextView status;
     // Ejecutar en background?
     Switch runInBackground;
-    // Usar camara frontal?
-    Switch useFrontalCam;
+    // Camaras disponibles
+    Spinner cameras;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,21 +54,24 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        // Recuperar componentes status
+        // Recuperar componentes generales
         status = findViewById(R.id.textView_status);
         status.setText(mRecordingStatus ? "Activo" : "Inactivo");
         runInBackground = findViewById(R.id.switch_toBackground);
         runInBackground.setChecked(toBackground);
-        useFrontalCam = findViewById(R.id.switch_useFrontal);
-        useFrontalCam.setChecked(useFrontal);
         path = findViewById(R.id.editText_path);
 
-        ((Button)findViewById(R.id.button_startService)).requestFocus();
+        // Lista de camaras.  De existir al menos una, seleccionarla
+        ArrayList<String> opciones = Utils.getCameraList();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, opciones);
+        cameras = findViewById(R.id.spinner_cameras);
+        cameras.setAdapter(adapter);
+        cameras.setSelection(useFrontal ? android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT : android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK);
     }
 
     public void iniciar(View v) {
         // Debe usarse la camara frontal o la trasera?
-        useFrontal = useFrontalCam.isChecked();
+        useFrontal = (cameras.getSelectedItemId() > android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK);
 
         // Iniciar el intent con el servicio de grabacion
         Intent intent = new Intent  (this, RecorderService.class);

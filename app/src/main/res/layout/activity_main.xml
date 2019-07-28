@@ -67,12 +67,17 @@
                 android:onClick="detener"
                 android:text="STOP" />
 
-            <Switch
-                android:id="@+id/switch_useFrontal"
+            <TextView
+                android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:height="40dp"
-                android:text="Frontal cam" />
+                android:text="Camera" />
+
+            <Spinner
+                android:id="@+id/spinner_cameras"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp" />
 
             <Switch
                 android:id="@+id/switch_toBackground"

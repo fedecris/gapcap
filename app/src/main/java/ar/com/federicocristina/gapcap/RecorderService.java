@@ -32,22 +32,9 @@ public class RecorderService extends Service {
     public void onCreate() {
         MainActivity.mRecordingStatus = false;
 
-        // Buscar la carama frontal si corresponde
-        int i = 0;
-        boolean found = false;
-        if (MainActivity.useFrontal) {
-            for (i = 0; i < Camera.getNumberOfCameras(); i++) {
-                Camera.CameraInfo newInfo = new Camera.CameraInfo();
-                Camera.getCameraInfo(i, newInfo);
-                if (newInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                    found = true;
-                }
-            }
-        }
-
         // Si se selecciono utilizar la camara frontal y se encontró
-        if (MainActivity.useFrontal && found)
-            mServiceCamera = Camera.open(i-1);
+        if (MainActivity.useFrontal)
+            mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
         else
             mServiceCamera = Camera.open();
 
