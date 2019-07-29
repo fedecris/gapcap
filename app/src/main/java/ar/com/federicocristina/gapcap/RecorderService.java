@@ -9,6 +9,7 @@ import android.hardware.Camera.Size;
 import android.media.MediaRecorder;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -74,6 +75,11 @@ public class RecorderService extends Service {
             params.setPreviewFormat(PixelFormat.YCbCr_420_SP);
             mServiceCamera.setParameters(params);
 
+            ViewGroup.LayoutParams layoutParams = MainActivity.mFrameLayoutPreview.getLayoutParams();
+            layoutParams.height = preferredSize.height;
+            layoutParams.width = preferredSize.width;
+            MainActivity.mFrameLayoutPreview.setLayoutParams(layoutParams);
+
             try {
                 mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
                 mServiceCamera.startPreview();
@@ -95,7 +101,7 @@ public class RecorderService extends Service {
             mMediaRecorder.setVideoEncodingBitRate(6000000);
             mMediaRecorder.setOutputFile(Utils.getRecordingPath());
             mMediaRecorder.setVideoFrameRate(30);
-            mMediaRecorder.setVideoSize(MainActivity.useFrontal?640:720, 480); // mMediaRecorder.setVideoSize(mPreviewSize.width, mPreviewSize.height);
+            mMediaRecorder.setVideoSize(getRecordingVideoSize(0), getRecordingVideoSize(1));
             mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
 
             mMediaRecorder.prepare();
@@ -128,6 +134,11 @@ public class RecorderService extends Service {
 
         mServiceCamera.release();
         mServiceCamera = null;
+    }
+
+    /** Retorna el tamaño de grabacion segun la seleccion del usuario */
+    protected int getRecordingVideoSize(int dimension) {
+        return Integer.parseInt(MainActivity.videoSizeSpinner.getSelectedItem().toString().split("x")[dimension]);
     }
 
 }

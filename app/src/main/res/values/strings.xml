@@ -4,4 +4,5 @@
     <string name="RecordingStatusReady">Ready</string>
     <string name="ServiceStarted">Service Started</string>
     <string name="ServiceStopped">Service Stopped</string>
+    <string name="DimensionSeparator">x</string>
 </resources>

@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 
 public class Utils {
 
@@ -66,6 +67,21 @@ public class Utils {
             default:
                 return 270;             // El celular esta boca abajo?
         }
+    }
+
+    /** Retorna el listado de posibles tamaños de captura */
+    public static HashMap<Integer, List<Camera.Size>> getSupportedVideoSizes() {
+        HashMap retValue = new HashMap<Integer, List<Camera.Size>>();
+
+        Camera cam = Camera.open();
+        retValue.put(Camera.CameraInfo.CAMERA_FACING_BACK, cam.getParameters().getSupportedVideoSizes()!=null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
+        cam.release();
+
+        cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        retValue.put(Camera.CameraInfo.CAMERA_FACING_FRONT, cam.getParameters().getSupportedVideoSizes()!=null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
+        cam.release();
+
+        return retValue;
     }
 }
 

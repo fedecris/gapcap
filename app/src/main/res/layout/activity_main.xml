@@ -65,9 +65,17 @@
                     android:text="STOP" />
             </LinearLayout>
 
-            <FrameLayout
+            <Switch
+                android:id="@+id/switch_toBackground"
                 android:layout_width="match_parent"
-                android:layout_height="100dp">
+                android:layout_height="wrap_content"
+                android:height="40dp"
+                android:text="Run in background" />
+
+            <FrameLayout
+                android:id="@+id/frameLayout_preview"
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
 
                 <SurfaceView
                     android:id="@+id/surfaceView1"
@@ -79,14 +87,19 @@
                 android:id="@+id/switch_frontalCamera"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="reLoadVideoSizes"
                 android:text="Front camera" />
 
-            <Switch
-                android:id="@+id/switch_toBackground"
+            <TextView
+                android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:height="40dp"
-                android:text="Run in background" />
+                android:text="Video size" />
+
+            <Spinner
+                android:id="@+id/spinner_videoSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/textView2"
