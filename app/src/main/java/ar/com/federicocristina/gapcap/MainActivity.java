@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     static public boolean mRecordingStatus = false;
     // Usar frontal o trasera?
     static public boolean useFrontal = false;
-    // Usar portrait (o landscape)
-    static public boolean usePortrait = false;
     // Enviar al background?
     public static boolean toBackground = true;
     // Camara de grabacion
@@ -39,12 +37,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     // Path de grabacion
     public static EditText path;
-    // Orientacion
-    public static EditText displayOrientation;
     // Ejecutar en background?
     public static Switch frontalCameraSwitch;
-    // Capturar portrait?
-    public static Switch portraitModeSwitch;
     // Estado de grabacion
     TextView status;
     // Ejecutar en background?
@@ -54,8 +48,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        displayOrientation = (EditText)findViewById(R.id.editText_orientation);
 
         // Iniciarlizar superficie
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView1);
@@ -74,19 +66,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
         frontalCameraSwitch.setChecked(useFrontal);
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
-
-        // Portrait o landscape
-        portraitModeSwitch = (Switch)findViewById(R.id.switch_portrait);
-        portraitModeSwitch.setChecked(usePortrait);
-
     }
 
     public void iniciar(View v) {
         // Debe usarse la camara frontal o la trasera?
         useFrontal = frontalCameraSwitch.isChecked();
-
-        // Debe capturarse en modo portrait o modo landscape?
-        usePortrait = portraitModeSwitch.isChecked();
 
         // Iniciar el intent con el servicio de grabacion
         Intent intent = new Intent  (this, RecorderService.class);

@@ -7,11 +7,8 @@ import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.media.MediaRecorder;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -38,7 +35,7 @@ public class RecorderService extends Service {
         else
             mServiceCamera = Camera.open();
 
-//        mServiceCamera.setDisplayOrientation(Integer.parseInt(MainActivity.displayOrientation.getText().toString()));
+        mServiceCamera.setDisplayOrientation(Utils.getRotationForPreview(getBaseContext()));
 
         super.onCreate();
         if (MainActivity.mRecordingStatus == false)
@@ -76,13 +73,6 @@ public class RecorderService extends Service {
             Log.v(TAG, "use: width = " + mPreviewSize.width + " height = " + mPreviewSize.height);
             params.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
             params.setPreviewFormat(PixelFormat.YCbCr_420_SP);
-            if (MainActivity.usePortrait) {
-                params.set("orientation", "portrait");
-                params.set("rotation", "0");
-            } else {
-                params.set("orientation", "landscape");
-                params.set("rotation", "90");
-            }
             mServiceCamera.setParameters(params);
 
             try {
