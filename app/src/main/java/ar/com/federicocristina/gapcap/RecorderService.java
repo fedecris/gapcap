@@ -63,15 +63,14 @@ public class RecorderService extends Service {
 
     public boolean startRecording(){
         try {
-            Toast.makeText(getBaseContext(), "Service Started", Toast.LENGTH_SHORT).show();
+            // Notificar sobre el inicio del servicio
+            Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
             Notification note=new Notification();
             startForeground(id, note);
 
             Camera.Parameters params = mServiceCamera.getParameters();
-            final List<Size> listSize = params.getSupportedPreviewSizes();
-            Size mPreviewSize = listSize.get(MainActivity.useFrontal ? 0 : 2); // 0 para frontal 2 para trasera (Samsung S2)
-            Log.v(TAG, "use: width = " + mPreviewSize.width + " height = " + mPreviewSize.height);
-            params.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+            Size preferredSize = params.getPreferredPreviewSizeForVideo();
+            params.setPreviewSize(preferredSize.width, preferredSize.height);
             params.setPreviewFormat(PixelFormat.YCbCr_420_SP);
             mServiceCamera.setParameters(params);
 
@@ -105,10 +104,6 @@ public class RecorderService extends Service {
             MainActivity.mRecordingStatus = true;
 
             return true;
-        } catch (IllegalStateException e) {
-            Log.d(TAG, e.getMessage());
-            e.printStackTrace();
-            return false;
         } catch (IOException e) {
             Log.d(TAG, e.getMessage());
             e.printStackTrace();
@@ -117,7 +112,7 @@ public class RecorderService extends Service {
     }
 
     public void stopRecording() {
-        Toast.makeText(getBaseContext(), "Service Stopped", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
         stopForeground(true);
         try {
             mServiceCamera.reconnect();

@@ -49,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Habilitar icono en ActionBar
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+
         // Iniciarlizar superficie
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView1);
         mSurfaceHolder = mSurfaceView.getHolder();
@@ -57,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         // Recuperar componentes generales
         status = findViewById(R.id.textView_status);
-        status.setText(mRecordingStatus ? "Activo" : "Inactivo");
+        status.setText(mRecordingStatus ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
         runInBackground = findViewById(R.id.switch_toBackground);
         runInBackground.setChecked(toBackground);
         path = findViewById(R.id.editText_path);
@@ -66,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
         frontalCameraSwitch.setChecked(useFrontal);
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
+
+        updateStartStopButtons(mRecordingStatus);
     }
 
     public void iniciar(View v) {
@@ -80,17 +86,24 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         // Finalizar la actividad si corresponde
         toBackground = runInBackground.isChecked();
-        status.setText("Activo");
+        status.setText(R.string.RecordingStatusActive);
         if (toBackground) {
             finish();
         }
+        updateStartStopButtons(true);
     }
 
     public void detener(View v) {
         stopService(new Intent(MainActivity.this, RecorderService.class));
-        status.setText("Inactivo");
+        status.setText(R.string.RecordingStatusReady);
+        updateStartStopButtons(false);
     }
 
+
+    protected void updateStartStopButtons(boolean recording) {
+        ((Button)findViewById(R.id.button_startService)).setEnabled(!recording);
+        ((Button)findViewById(R.id.button_StopService)).setEnabled(recording);
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
