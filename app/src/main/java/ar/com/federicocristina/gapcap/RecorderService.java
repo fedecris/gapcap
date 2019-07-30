@@ -28,19 +28,25 @@ public class RecorderService extends Service {
 
     @Override
     public void onCreate() {
-        MainActivity.mRecordingStatus = false;
+        try {
 
-        // Si se selecciono utilizar la camara frontal
-        if (MainActivity.useFrontal)
-            mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
-        else
-            mServiceCamera = Camera.open();
+            // Si se selecciono utilizar la camara frontal
+            if (MainActivity.useFrontal)
+                mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
+            else
+                mServiceCamera = Camera.open();
 
-        mServiceCamera.setDisplayOrientation(Utils.getRotationForPreview(getBaseContext()));
+            // Adecuar segun orientacion del dispositivo
+            mServiceCamera.setDisplayOrientation(Utils.getRotationForPreview(getBaseContext()));
 
-        super.onCreate();
-        if (MainActivity.mRecordingStatus == false)
-            startRecording();
+            super.onCreate();
+            if (MainActivity.mRecordingStatus == false)
+                MainActivity.mRecordingStatus = startRecording();
+        } catch (RuntimeException e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (Exception e2) {
+            Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -51,9 +57,7 @@ public class RecorderService extends Service {
 
     @Override
     public void onDestroy() {
-        stopRecording();
-        MainActivity.mRecordingStatus = false;
-
+        stopRecording(false);
         super.onDestroy();
     }
 
@@ -64,11 +68,6 @@ public class RecorderService extends Service {
 
     public boolean startRecording(){
         try {
-            // Notificar sobre el inicio del servicio
-            Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
-            Notification note=new Notification();
-            startForeground(id, note);
-
             Camera.Parameters params = mServiceCamera.getParameters();
             Size preferredSize = params.getPreferredPreviewSizeForVideo();
             params.setPreviewSize(preferredSize.width, preferredSize.height);
@@ -80,15 +79,8 @@ public class RecorderService extends Service {
             layoutParams.width = preferredSize.width;
             MainActivity.mFrameLayoutPreview.setLayoutParams(layoutParams);
 
-            try {
-                mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
-                mServiceCamera.startPreview();
-            }
-            catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-                e.printStackTrace();
-            }
-
+            mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
+            mServiceCamera.startPreview();
             mServiceCamera.unlock();
 
             mMediaRecorder = new MediaRecorder();
@@ -98,8 +90,8 @@ public class RecorderService extends Service {
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            mMediaRecorder.setVideoEncodingBitRate(6000000);
             mMediaRecorder.setOutputFile(Utils.getRecordingPath());
+            mMediaRecorder.setVideoEncodingBitRate(6000000);
             mMediaRecorder.setVideoFrameRate(30);
             mMediaRecorder.setVideoSize(getRecordingVideoSize(0), getRecordingVideoSize(1));
             mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
@@ -108,32 +100,57 @@ public class RecorderService extends Service {
             mMediaRecorder.start();
 
             MainActivity.mRecordingStatus = true;
+            MainActivity.updateStartStopButtons(MainActivity.mRecordingStatus);
+
+            // Notificar sobre el inicio del servicio
+            Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
+            Notification note=new Notification();
+            startForeground(id, note);
 
             return true;
-        } catch (IOException e) {
-            Log.d(TAG, e.getMessage());
-            e.printStackTrace();
+        } catch (RuntimeException e2) {
+            Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
+            stopRecording(true);
+            return false;
+         } catch (Exception e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            stopRecording(true);
             return false;
         }
     }
 
-    public void stopRecording() {
-        Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
-        stopForeground(true);
+    public void stopRecording(boolean withError ) {
         try {
-            mServiceCamera.reconnect();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            MainActivity.mRecordingStatus = false;
+            MainActivity.updateStartStopButtons(MainActivity.mRecordingStatus);
+            stopForeground(true);
+
+            try {
+                mMediaRecorder.stop();
+                mMediaRecorder.reset();
+                mMediaRecorder.release();
+            } catch (Exception e) { }
+
+            try {
+                mServiceCamera.reconnect();
+                mServiceCamera.stopPreview();
+                mServiceCamera.release();
+                mServiceCamera = null;
+            } catch (Exception e) { }
+
+            if (!withError) {
+                Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
+            } else {
+                stopSelf();
+            }
+
+
+        } catch (RuntimeException e2) {
+            Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
         }
-        mMediaRecorder.stop();
-        mMediaRecorder.reset();
 
-        mServiceCamera.stopPreview();
-        mMediaRecorder.release();
-
-        mServiceCamera.release();
-        mServiceCamera = null;
     }
 
     /** Retorna el tamaño de grabacion segun la seleccion del usuario */

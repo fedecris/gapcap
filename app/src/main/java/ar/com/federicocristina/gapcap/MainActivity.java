@@ -37,8 +37,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Tamaños de grabacion
     public static HashMap<Integer, List<android.hardware.Camera.Size>> cameraVideoSizes = null;
 
-
-
+    // Start button
+    public static Button startButton;
+    // Stop button
+    public static Button stopButton;
     // Path de grabacion
     public static EditText path;
     // Ejecutar en background?
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Video Size
     public static Spinner videoSizeSpinner;
     // Estado de grabacion
-    TextView status;
+    public static TextView status;
     // Ejecutar en background?
     Switch runInBackground;
 
@@ -59,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.ic_launcher);
 
+        // Botones start stop
+        startButton = findViewById(R.id.button_startService);
+        stopButton = findViewById(R.id.button_StopService);
+
         // Iniciarlizar superficie
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView1);
         mSurfaceHolder = mSurfaceView.getHolder();
@@ -68,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         // Recuperar componentes generales
         status = findViewById(R.id.textView_status);
-        status.setText(mRecordingStatus ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
         runInBackground = findViewById(R.id.switch_toBackground);
         runInBackground.setChecked(toBackground);
         path = findViewById(R.id.editText_path);
@@ -98,23 +103,21 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         // Finalizar la actividad si corresponde
         toBackground = runInBackground.isChecked();
-        status.setText(R.string.RecordingStatusActive);
+
         if (toBackground) {
             finish();
         }
-        updateStartStopButtons(true);
     }
 
     public void detener(View v) {
         stopService(new Intent(MainActivity.this, RecorderService.class));
-        status.setText(R.string.RecordingStatusReady);
-        updateStartStopButtons(false);
     }
 
     /** Activa o desactiva los botones segun el estado de grabacion */
-    protected void updateStartStopButtons(boolean recording) {
-        ((Button)findViewById(R.id.button_startService)).setEnabled(!recording);
-        ((Button)findViewById(R.id.button_StopService)).setEnabled(recording);
+    public static void updateStartStopButtons(boolean recording) {
+        ((Button)startButton).setEnabled(!recording);
+        ((Button)stopButton).setEnabled(recording);
+        status.setText(recording ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
     }
 
     public void reLoadVideoSizes(View view) {
