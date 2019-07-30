@@ -91,9 +91,10 @@ public class RecorderService extends Service {
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            mMediaRecorder.setOutputFile(Utils.getRecordingPath());
+            mMediaRecorder.setOutputFile(Utils.getRecordingFileName());
             mMediaRecorder.setVideoEncodingBitRate(6000000);
-            mMediaRecorder.setVideoFrameRate(30);
+            mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
+            mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
             mMediaRecorder.setVideoSize(getRecordingVideoSize(0), getRecordingVideoSize(1));
             mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
             mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext()));

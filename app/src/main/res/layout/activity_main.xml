@@ -102,6 +102,17 @@
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="FPS" />
+
+            <Spinner
+                android:id="@+id/spinner_fps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -118,6 +129,20 @@
                 android:inputType="textPersonName"
                 android:text="/installer/Xtras/"
                 tools:targetApi="o" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="File prefix" />
+
+            <EditText
+                android:id="@+id/editText_filePrefix"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="cap_" />
 
         </LinearLayout>
     </ScrollView>

@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static boolean toBackground = true;
     // Tamaños de grabacion
     public static HashMap<Integer, List<android.hardware.Camera.Size>> cameraVideoSizes = null;
+    // Tamaños de grabacion
+    public static HashMap<Integer, List<Integer>> cameraFPS = null;
 
     // Start button
     public static Button startButton;
@@ -43,10 +45,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static Button stopButton;
     // Path de grabacion
     public static EditText path;
+    // Path de grabacion
+    public static EditText filePrefix;
     // Ejecutar en background?
     public static Switch frontalCameraSwitch;
     // Video Size
     public static Spinner videoSizeSpinner;
+    // Video Size
+    public static Spinner fpsSpinner;
     // Estado de grabacion
     public static TextView status;
     // Ejecutar en background?
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         runInBackground = findViewById(R.id.switch_toBackground);
         runInBackground.setChecked(toBackground);
         path = findViewById(R.id.editText_path);
+        filePrefix = findViewById(R.id.editText_filePrefix);
 
         // Gestion de seleccion de camara
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
@@ -85,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         // Modos de captura
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
+        loadSupportedFPS(frontalCameraSwitch.isChecked());
         // Habiliacion de boton de grabacion
         updateStartStopButtons(mRecordingStatus);
 
@@ -122,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     public void reLoadVideoSizes(View view) {
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
+        loadSupportedFPS(frontalCameraSwitch.isChecked());
     }
 
     /** Carga el spinner de opciones de tamaño de grabacion */
@@ -135,9 +144,25 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         for (Camera.Size size : sizes) {
             opciones.add(size.width + "x" + size.height);
         }
-        videoSizeSpinner = findViewById(R.id.spinner_videoSize);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, android.R.layout.simple_spinner_item, opciones);
+        videoSizeSpinner = (Spinner)findViewById(R.id.spinner_videoSize);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
         videoSizeSpinner.setAdapter(adapter);
+    }
+
+    /** Carga el spinner de opciones de tamaño de grabacion */
+    protected void loadSupportedFPS(boolean frontalCam) {
+        if (cameraFPS == null) {
+            cameraFPS = Utils.getSupportedFps();
+        }
+
+        ArrayList<String> opciones = new ArrayList<String>();
+        List<Integer> fpss = cameraFPS.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
+        for (Integer fps: fpss) {
+            opciones.add(fps.toString());
+        }
+        fpsSpinner = (Spinner)findViewById(R.id.spinner_fps);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
+        fpsSpinner.setAdapter(adapter);
     }
 
     @Override

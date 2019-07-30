@@ -26,8 +26,8 @@ public class Utils {
     }
 
     /** Ubicacions de la grabacion */
-    public static String getRecordingPath() {
-        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.path.getText().toString() + File.separator +  "cap_" + Utils.getDateTime() + ".mp4";
+    public static String getRecordingFileName() {
+        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.path.getText().toString() + File.separator +  MainActivity.filePrefix.getText().toString() + Utils.getDateTime() + ".mp4";
         // Quitar dobles slashes
         retValue = retValue.replace("//", "/");
         return retValue;
@@ -69,7 +69,7 @@ public class Utils {
         }
     }
 
-    /** Retorna el listado de posibles tamaños de captura */
+    /** Retorna el listado de posibles tamaños de captura (por cada camara) */
     public static HashMap<Integer, List<Camera.Size>> getSupportedVideoSizes() {
         HashMap retValue = new HashMap<Integer, List<Camera.Size>>();
 
@@ -77,9 +77,30 @@ public class Utils {
         retValue.put(Camera.CameraInfo.CAMERA_FACING_BACK, cam.getParameters().getSupportedVideoSizes()!=null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
         cam.release();
 
-        cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        retValue.put(Camera.CameraInfo.CAMERA_FACING_FRONT, cam.getParameters().getSupportedVideoSizes()!=null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
+        if (existsFrontalCamera()) {
+            cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            retValue.put(Camera.CameraInfo.CAMERA_FACING_FRONT, cam.getParameters().getSupportedVideoSizes() != null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
+            cam.release();
+        }
+
+        return retValue;
+    }
+
+    /** Retorna los FPS disponibles (por cada camara) */
+    public static HashMap<Integer, List<Integer>> getSupportedFps() {
+        HashMap retValue = new HashMap<Integer, List<Integer>>();
+
+        Camera cam = Camera.open();
+        Camera.Parameters params = cam.getParameters();
+        retValue.put(Camera.CameraInfo.CAMERA_FACING_BACK, params.getSupportedPreviewFrameRates());
         cam.release();
+
+        if (existsFrontalCamera()) {
+            cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            params = cam.getParameters();
+            retValue.put(Camera.CameraInfo.CAMERA_FACING_FRONT, params.getSupportedPreviewFrameRates());
+            cam.release();
+        }
 
         return retValue;
     }
