@@ -74,10 +74,11 @@ public class RecorderService extends Service {
             params.setPreviewFormat(PixelFormat.YCbCr_420_SP);
             mServiceCamera.setParameters(params);
 
-            ViewGroup.LayoutParams layoutParams = MainActivity.mFrameLayoutPreview.getLayoutParams();
-            layoutParams.height = preferredSize.height;
-            layoutParams.width = preferredSize.width;
-            MainActivity.mFrameLayoutPreview.setLayoutParams(layoutParams);
+            // Comentado. Se omite la inclusion del preview
+            //ViewGroup.LayoutParams layoutParams = MainActivity.mFrameLayoutPreview.getLayoutParams();
+            //layoutParams.height = preferredSize.height;
+            //layoutParams.width = preferredSize.width;
+            //MainActivity.mFrameLayoutPreview.setLayoutParams(layoutParams);
 
             mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
             mServiceCamera.startPreview();
@@ -95,7 +96,7 @@ public class RecorderService extends Service {
             mMediaRecorder.setVideoFrameRate(30);
             mMediaRecorder.setVideoSize(getRecordingVideoSize(0), getRecordingVideoSize(1));
             mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
-
+            mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext()));
             mMediaRecorder.prepare();
             mMediaRecorder.start();
 
