@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,15 +30,24 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static SurfaceHolder mSurfaceHolder;
     public static FrameLayout mFrameLayoutPreview;
     // Estado de grabacion
-    static public boolean mRecordingStatus = false;
+    public static boolean mRecordingStatus = false;
     // Usar frontal o trasera?
-    static public boolean useFrontal = false;
+    public static boolean useFrontal = false;
+    // Usar low quality?
+    public static boolean lowQuality = false;
+    // Record audio?
+    public static boolean recordAudio = true;
     // Enviar al background?
     public static boolean toBackground = true;
     // Tamaños de grabacion
     public static HashMap<Integer, List<android.hardware.Camera.Size>> cameraVideoSizes = null;
     // Tamaños de grabacion
     public static HashMap<Integer, List<Integer>> cameraFPS = null;
+    // Current option videoSize
+    public static int currentVideoSize = 0;
+    // Current option fps
+    public static int currentFPS = 0;
+
 
     // Start button
     public static Button startButton;
@@ -47,8 +57,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static EditText path;
     // Path de grabacion
     public static EditText filePrefix;
-    // Ejecutar en background?
+    // Camara frontal?
     public static Switch frontalCameraSwitch;
+    // Usar calidad baja?
+    public static Switch lowQualitySwitch;
+    // Grabar audio?
+    public static Switch recordAudioSwitch;
     // Video Size
     public static Spinner videoSizeSpinner;
     // Video Size
@@ -85,6 +99,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         path = findViewById(R.id.editText_path);
         filePrefix = findViewById(R.id.editText_filePrefix);
 
+        // Calidad
+        lowQualitySwitch = (Switch)findViewById(R.id.switch_lowQuality);
+        lowQualitySwitch.setChecked(lowQuality);
+
+        recordAudioSwitch = (Switch)findViewById(R.id.switch_audio);
+        recordAudioSwitch.setChecked(recordAudio);
+
         // Gestion de seleccion de camara
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
         frontalCameraSwitch.setChecked(useFrontal);
@@ -96,12 +117,33 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         // Habiliacion de boton de grabacion
         updateStartStopButtons(mRecordingStatus);
 
+        // Spinners
+        videoSizeSpinner.setSelection(currentVideoSize);
+        fpsSpinner.setSelection(currentFPS);
+        fpsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                fpsChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
 
     }
 
     public void iniciar(View v) {
         // Debe usarse la camara frontal o la trasera?
         useFrontal = frontalCameraSwitch.isChecked();
+
+        // Low quality?
+        lowQuality = lowQualitySwitch.isChecked();
+
+        // Record audio?
+        recordAudio = recordAudioSwitch.isChecked();
 
         // Iniciar el intent con el servicio de grabacion
         Intent intent = new Intent  (this, RecorderService.class);
@@ -133,6 +175,16 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         loadSupportedFPS(frontalCameraSwitch.isChecked());
     }
 
+    public void fpsChanged() {
+        // Si se selecciono grabar audio pero el FPS no es el por defecto, entonces quitar el audio
+        if (cameraFPS!=null && (!"<Default>".equals(fpsSpinner.getSelectedItem().toString()))) {
+            recordAudioSwitch.setChecked(false);
+            recordAudioSwitch.setEnabled(false);
+        } else {
+            recordAudioSwitch.setEnabled(true);
+        }
+    }
+
     /** Carga el spinner de opciones de tamaño de grabacion */
     protected void loadSupportedVideoSizes(boolean frontalCam) {
         if (cameraVideoSizes == null) {
@@ -156,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
 
         ArrayList<String> opciones = new ArrayList<String>();
+        opciones.add("<Default>");
         List<Integer> fpss = cameraFPS.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
         for (Integer fps: fpss) {
             opciones.add(fps.toString());

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.IBinder;
 import android.util.Log;
@@ -86,15 +87,21 @@ public class RecorderService extends Service {
 
             mMediaRecorder = new MediaRecorder();
             mMediaRecorder.setCamera(mServiceCamera);
-            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            if (MainActivity.recordAudio) {
+                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            }
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+            if (MainActivity.recordAudio) {
+                mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+            }
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
             mMediaRecorder.setOutputFile(Utils.getRecordingFileName());
-            mMediaRecorder.setVideoEncodingBitRate(6000000);
-            mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
-            mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
+            mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(MainActivity.lowQuality ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
+            if (!("<Default>".equals(MainActivity.fpsSpinner.getSelectedItem().toString()))) {
+                mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
+                mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
+            }
             mMediaRecorder.setVideoSize(getRecordingVideoSize(0), getRecordingVideoSize(1));
             mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
             mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext()));

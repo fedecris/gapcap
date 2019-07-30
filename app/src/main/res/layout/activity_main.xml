@@ -90,6 +90,18 @@
                 android:onClick="reLoadVideoSizes"
                 android:text="Front camera" />
 
+            <Switch
+                android:id="@+id/switch_audio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Record audio" />
+
+            <Switch
+                android:id="@+id/switch_lowQuality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Low quality" />
+
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
