@@ -3,8 +3,6 @@ package ar.com.federicocristina.gapcap;
 import android.content.Context;
 import android.hardware.Camera;
 import android.os.Environment;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
 
@@ -27,7 +25,7 @@ public class Utils {
 
     /** Ubicacions de la grabacion */
     public static String getRecordingFileName() {
-        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.path.getText().toString() + File.separator +  MainActivity.filePrefix.getText().toString() + Utils.getDateTime() + ".mp4";
+        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePath.getText().toString() + File.separator +  MainActivity.filePrefix.getText().toString() + Utils.getDateTime() + ".mp4";
         // Quitar dobles slashes
         retValue = retValue.replace("//", "/");
         return retValue;

@@ -1,7 +1,9 @@
 package ar.com.federicocristina.gapcap;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Stop button
     public static Button stopButton;
     // Path de grabacion
-    public static EditText path;
+    public static EditText filePath;
     // Path de grabacion
     public static EditText filePrefix;
     // Camara frontal?
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Estado de grabacion
     public static TextView status;
     // Ejecutar en background?
-    Switch runInBackground;
+    public static Switch runInBackgroundSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,9 +97,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         // Recuperar componentes generales
         status = findViewById(R.id.textView_status);
-        runInBackground = findViewById(R.id.switch_toBackground);
-        runInBackground.setChecked(toBackground);
-        path = findViewById(R.id.editText_path);
+        runInBackgroundSwitch = findViewById(R.id.switch_toBackground);
+        runInBackgroundSwitch.setChecked(toBackground);
+        filePath = findViewById(R.id.editText_path);
         filePrefix = findViewById(R.id.editText_filePrefix);
 
         // Calidad
@@ -110,9 +113,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
         frontalCameraSwitch.setChecked(useFrontal);
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
+        frontalCameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                           @Override
+                                                           public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                               reLoadVideoSizesAndFPS();
+                                                           }
+                                                       });
 
-        // Modos de captura
-        loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
+                // Modos de captura
+                loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
         loadSupportedFPS(frontalCameraSwitch.isChecked());
         // Habiliacion de boton de grabacion
         updateStartStopButtons(mRecordingStatus);
@@ -133,6 +142,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         });
 
+        loadSharedPreferences();
+
     }
 
     public void iniciar(View v) {
@@ -152,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         ret.getClassName();
 
         // Finalizar la actividad si corresponde
-        toBackground = runInBackground.isChecked();
+        toBackground = runInBackgroundSwitch.isChecked();
 
         if (toBackground) {
             finish();
@@ -170,14 +181,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         status.setText(recording ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
     }
 
-    public void reLoadVideoSizes(View view) {
+    public void reLoadVideoSizesAndFPS() {
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
         loadSupportedFPS(frontalCameraSwitch.isChecked());
     }
 
     public void fpsChanged() {
         // Si se selecciono grabar audio pero el FPS no es el por defecto, entonces quitar el audio
-        if (cameraFPS!=null && (!"<Default>".equals(fpsSpinner.getSelectedItem().toString()))) {
+        if (cameraFPS!=null && (!Constants.FPS_DEFAULT.equals(fpsSpinner.getSelectedItem().toString()))) {
             recordAudioSwitch.setChecked(false);
             recordAudioSwitch.setEnabled(false);
         } else {
@@ -208,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
 
         ArrayList<String> opciones = new ArrayList<String>();
-        opciones.add("<Default>");
+        opciones.add(Constants.FPS_DEFAULT);
         List<Integer> fpss = cameraFPS.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
         for (Integer fps: fpss) {
             opciones.add(fps.toString());
@@ -216,6 +227,38 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         fpsSpinner = (Spinner)findViewById(R.id.spinner_fps);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
         fpsSpinner.setAdapter(adapter);
+    }
+
+    protected void loadSharedPreferences() {
+        SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        filePath.setText(preferences.getString(Constants.PREFERENCE_FILEPATH, ""));
+        filePrefix.setText(preferences.getString(Constants.PREFERENCE_FILEPREFIX, ""));
+        runInBackgroundSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RUNINBACKGROUND, true));
+        frontalCameraSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_FRONT_CAMERA, false));
+        recordAudioSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RECORD_AUDIO, false));
+        lowQualitySwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_LOW_QUALIY, false));
+        videoSizeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_SIZE, 0));
+        fpsSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FPS, 0));
+    }
+
+    protected void saveSharedPreferences() {
+        SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(Constants.PREFERENCE_FILEPATH, filePath.getText().toString());
+        editor.putString(Constants.PREFERENCE_FILEPREFIX, filePrefix.getText().toString());
+        editor.putBoolean(Constants.PREFERENCE_RUNINBACKGROUND, runInBackgroundSwitch.isChecked());
+        editor.putBoolean(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
+        editor.putBoolean(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
+        editor.putBoolean(Constants.PREFERENCE_LOW_QUALIY, lowQualitySwitch.isChecked());
+        editor.putInt(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_FPS, fpsSpinner.getSelectedItemPosition());
+        editor.commit();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveSharedPreferences();
     }
 
     @Override

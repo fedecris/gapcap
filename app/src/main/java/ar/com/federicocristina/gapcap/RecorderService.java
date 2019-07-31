@@ -87,24 +87,41 @@ public class RecorderService extends Service {
 
             mMediaRecorder = new MediaRecorder();
             mMediaRecorder.setCamera(mServiceCamera);
+
+            // AUDIO AND VIDEO SOURCE
             if (MainActivity.recordAudio) {
-                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             }
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+
+            // AUDIO AND VIDEO ENCODERS
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
             if (MainActivity.recordAudio) {
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
             }
-            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            mMediaRecorder.setOutputFile(Utils.getRecordingFileName());
+
+            // VIDEO SIZE
+            int width = getRecordingVideoSize(0);
+            int height = getRecordingVideoSize(1);
+            mMediaRecorder.setVideoSize(width, height);
+
+            // ENCONDING QUALITY
             mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(MainActivity.lowQuality ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
-            if (!("<Default>".equals(MainActivity.fpsSpinner.getSelectedItem().toString()))) {
+
+            // FRAME RATE
+            if (!(Constants.FPS_DEFAULT.equals(MainActivity.fpsSpinner.getSelectedItem().toString()))) {
                 mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
                 mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
             }
-            mMediaRecorder.setVideoSize(getRecordingVideoSize(0), getRecordingVideoSize(1));
+
+            // ORIENTACION DEL DISPOSITIVO
             mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
             mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext()));
+
+            // OUTPUT FILE
+            mMediaRecorder.setOutputFile(Utils.getRecordingFileName());
+
             mMediaRecorder.prepare();
             mMediaRecorder.start();
 
