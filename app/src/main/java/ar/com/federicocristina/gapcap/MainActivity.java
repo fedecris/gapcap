@@ -45,9 +45,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Stop button
     public static Button stopButton;
     // Path de grabacion
-    public static EditText filePath;
+    public static EditText filePathEditText;
     // Path de grabacion
-    public static EditText filePrefix;
+    public static EditText filePrefixEditText;
+    // Timestamp del archivo
+    public static EditText fileTimestampEditText;
     // Camara frontal?
     public static Switch frontalCameraSwitch;
     // Usar calidad baja?
@@ -84,8 +86,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         stopButton = findViewById(R.id.button_StopService);
         status = findViewById(R.id.textView_status);
         runInBackgroundSwitch = findViewById(R.id.switch_toBackground);
-        filePath = findViewById(R.id.editText_path);
-        filePrefix = findViewById(R.id.editText_filePrefix);
+        filePathEditText = findViewById(R.id.editText_path);
+        filePrefixEditText = findViewById(R.id.editText_filePrefix);
+        fileTimestampEditText = findViewById(R.id.editText_filenameTimestamp);
         lowQualitySwitch = (Switch)findViewById(R.id.switch_lowQuality);
         recordAudioSwitch = (Switch)findViewById(R.id.switch_audio);
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
@@ -202,8 +205,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     protected void loadSharedPreferences() {
         SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        filePath.setText(preferences.getString(Constants.PREFERENCE_FILEPATH, "Specify a path to save the files"));
-        filePrefix.setText(preferences.getString(Constants.PREFERENCE_FILEPREFIX, "Specify a file prefix (optional)"));
+        filePathEditText.setText(preferences.getString(Constants.PREFERENCE_FILEPATH, "Specify a path to save the files"));
+        filePrefixEditText.setText(preferences.getString(Constants.PREFERENCE_FILEPREFIX, "Specify a file prefix (optional)"));
+        fileTimestampEditText.setText(preferences.getString(Constants.PREFERENCE_FILETIMESTAMP, "yyyyMMdd_HHmmss"));
         runInBackgroundSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RUNINBACKGROUND, true));
         frontalCameraSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_FRONT_CAMERA, false));
         recordAudioSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RECORD_AUDIO, false));
@@ -215,8 +219,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     protected void saveSharedPreferences() {
         SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(Constants.PREFERENCE_FILEPATH, filePath.getText().toString());
-        editor.putString(Constants.PREFERENCE_FILEPREFIX, filePrefix.getText().toString());
+        editor.putString(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
+        editor.putString(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
+        editor.putString(Constants.PREFERENCE_FILETIMESTAMP, fileTimestampEditText.getText().toString());
         editor.putBoolean(Constants.PREFERENCE_RUNINBACKGROUND, runInBackgroundSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());

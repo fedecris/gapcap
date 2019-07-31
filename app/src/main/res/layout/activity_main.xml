@@ -144,10 +144,23 @@
                 android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="File prefix" />
+                android:text="Filename prefix" />
 
             <EditText
                 android:id="@+id/editText_filePrefix"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filename timestamp" />
+
+            <EditText
+                android:id="@+id/editText_filenameTimestamp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"

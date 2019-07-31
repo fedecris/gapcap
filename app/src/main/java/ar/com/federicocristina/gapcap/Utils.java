@@ -20,12 +20,12 @@ public class Utils {
 
     /** Retorna la fecha y hora actual */
     public static String getDateTime() {
-        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+        return new SimpleDateFormat(MainActivity.fileTimestampEditText.getText().toString()).format(Calendar.getInstance().getTime());
     }
 
     /** Ubicacions de la grabacion */
     public static String getRecordingFileName() {
-        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePath.getText().toString() + File.separator +  MainActivity.filePrefix.getText().toString() + Utils.getDateTime() + ".mp4";
+        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePathEditText.getText().toString() + File.separator +  MainActivity.filePrefixEditText.getText().toString() + Utils.getDateTime() + ".mp4";
         // Quitar dobles slashes
         retValue = retValue.replace("//", "/");
         return retValue;
@@ -105,7 +105,7 @@ public class Utils {
 
     public static boolean recordingPathExists() {
         try {
-            File f = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePath.getText().toString());
+            File f = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePathEditText.getText().toString());
             return f.isDirectory();
         } catch (Exception e) {
             return false;

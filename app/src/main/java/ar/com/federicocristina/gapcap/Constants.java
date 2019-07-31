@@ -25,6 +25,8 @@ public class Constants {
     public static String PREFERENCE_FILEPATH        = "FILE_PATH";
     // Shared preference: file prefix
     public static String PREFERENCE_FILEPREFIX      = "FILE_PREFIX";
+    // Shared preference: file prefix
+    public static String PREFERENCE_FILETIMESTAMP   = "FILE_TIMESTAMP";
     // Shared preference: video size
     public static String PREFERENCE_VIDEO_SIZE      = "VIDEO_SIZE";
     // Shared preference: fps
