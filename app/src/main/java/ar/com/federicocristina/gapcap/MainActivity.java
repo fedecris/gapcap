@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     public void iniciar(View v) {
-
+        // Validar precondiciones
         String retValue = checkPreconditions();
         if (retValue!=null) {
             Toast.makeText(getBaseContext(), retValue, Toast.LENGTH_LONG).show();

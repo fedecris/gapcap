@@ -44,6 +44,7 @@ public class RecorderService extends Service {
         } catch (Exception e2) {
             Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
         }
+
     }
 
     @Override
@@ -78,7 +79,7 @@ public class RecorderService extends Service {
             //MainActivity.mFrameLayoutPreview.setLayoutParams(layoutParams);
 
             mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
-            mServiceCamera.startPreview();
+            //mServiceCamera.startPreview();
             mServiceCamera.unlock();
 
             mMediaRecorder = new MediaRecorder();
@@ -86,12 +87,12 @@ public class RecorderService extends Service {
 
             // AUDIO AND VIDEO SOURCE
             if (MainActivity.recordAudioSwitch.isChecked()) {
-                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             }
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
             // AUDIO AND VIDEO ENCODERS
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
             if (MainActivity.recordAudioSwitch.isChecked()) {
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
@@ -143,10 +144,6 @@ public class RecorderService extends Service {
 
     public void stopRecording(boolean withError ) {
         try {
-            MainActivity.mRecordingStatus = false;
-            MainActivity.updateStartStopButtons(MainActivity.mRecordingStatus);
-            stopForeground(true);
-
             try {
                 mMediaRecorder.stop();
                 mMediaRecorder.reset();
@@ -160,17 +157,22 @@ public class RecorderService extends Service {
                 mServiceCamera = null;
             } catch (Exception e) { }
 
+            stopForeground(true);
+            MainActivity.mRecordingStatus = false;
+            MainActivity.updateStartStopButtons(MainActivity.mRecordingStatus);
+
             if (!withError) {
                 Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
             } else {
                 stopSelf();
             }
 
-
         } catch (RuntimeException e2) {
             Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
+        } finally {
+            stopSelf();
         }
 
     }
