@@ -106,10 +106,15 @@ public class RecorderService extends Service {
             // ENCONDING QUALITY
             mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(MainActivity.lowQualitySwitch.isChecked() ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
 
-            // FRAME RATE
-            if (!(Constants.FPS_DEFAULT.equals(MainActivity.fpsSpinner.getSelectedItem().toString()))) {
-                mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
-                mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.fpsSpinner.getSelectedItem().toString()));
+            // Video frame rate
+            if (!(Constants.DEFAULT.equals(MainActivity.videoFrameRateSpinner.getSelectedItem().toString()))) {
+                mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.videoFrameRateSpinner.getSelectedItem().toString()));
+
+            }
+
+            // Capture frame rate (timelapse mode)
+            if (!(Constants.NO_OPTION.equals(MainActivity.captureFrameRateSpinner.getSelectedItem().toString()))) {
+                mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.captureFrameRateSpinner.getSelectedItem().toString()));
             }
 
             // ORIENTACION DEL DISPOSITIVO

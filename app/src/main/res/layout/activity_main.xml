@@ -117,10 +117,21 @@
                 android:id="@+id/textView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="FPS" />
+                android:text="Video frame rate (per second)" />
 
             <Spinner
-                android:id="@+id/spinner_fps"
+                android:id="@+id/spinner_videoFrameRate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Capture frame rate (video time lapse)" />
+
+            <Spinner
+                android:id="@+id/spinner_captureFrameRate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Tamaños de grabacion
     public static HashMap<Integer, List<android.hardware.Camera.Size>> cameraVideoSizes = null;
     // Tamaños de grabacion
-    public static HashMap<Integer, List<Integer>> cameraFPS = null;
+    public static HashMap<Integer, List<Integer>> videoFrameRate = null;
 
     // Start button
     public static Button startButton;
@@ -59,7 +59,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Video Size
     public static Spinner videoSizeSpinner;
     // Video Size
-    public static Spinner fpsSpinner;
+    public static Spinner videoFrameRateSpinner;
+    // Video Size
+    public static Spinner captureFrameRateSpinner;
     // Estado de grabacion
     public static TextView status;
     // Ejecutar en background?
@@ -91,26 +93,30 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         fileTimestampEditText = findViewById(R.id.editText_filenameTimestamp);
         lowQualitySwitch = (Switch)findViewById(R.id.switch_lowQuality);
         recordAudioSwitch = (Switch)findViewById(R.id.switch_audio);
+        videoFrameRateSpinner = (Spinner)findViewById(R.id.spinner_videoFrameRate);
+        captureFrameRateSpinner = (Spinner)findViewById(R.id.spinner_captureFrameRate);
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
         frontalCameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                                            @Override
                                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                               reLoadVideoSizesAndFPS();
+                                                               reLoadVideoSizesAndVideoFrameRate();
                                                            }
                                                        });
 
         // Modos de captura
+
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
-        loadSupportedFPS(frontalCameraSwitch.isChecked());
+        loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
+        loadCaptureFrameRates();
 
         // Habilitacion de boton de grabacion
         updateStartStopButtons(mRecordingStatus);
 
-        fpsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        captureFrameRateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                fpsChanged();
+                captureFrameRateChanged();
             }
 
             @Override
@@ -155,14 +161,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         status.setText(recording ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
     }
 
-    public void reLoadVideoSizesAndFPS() {
+    public void reLoadVideoSizesAndVideoFrameRate() {
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
-        loadSupportedFPS(frontalCameraSwitch.isChecked());
+        loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
     }
 
-    public void fpsChanged() {
+    public void captureFrameRateChanged() {
         // Si se selecciono grabar audio pero el FPS no es el por defecto, entonces quitar el audio
-        if (cameraFPS!=null && (!Constants.FPS_DEFAULT.equals(fpsSpinner.getSelectedItem().toString()))) {
+        if (!Constants.NO_OPTION.equals(captureFrameRateSpinner.getSelectedItem().toString())) {
             recordAudioSwitch.setChecked(false);
             recordAudioSwitch.setEnabled(false);
         } else {
@@ -187,20 +193,32 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     /** Carga el spinner de opciones de tamaño de grabacion */
-    protected void loadSupportedFPS(boolean frontalCam) {
-        if (cameraFPS == null) {
-            cameraFPS = Utils.getSupportedFps();
+    protected void loadSupportedVideoFrameRates(boolean frontalCam) {
+        if (videoFrameRate == null) {
+            videoFrameRate = Utils.getSupportedFps();
         }
 
         ArrayList<String> opciones = new ArrayList<String>();
-        opciones.add(Constants.FPS_DEFAULT);
-        List<Integer> fpss = cameraFPS.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
+        opciones.add(Constants.DEFAULT);
+        List<Integer> fpss = videoFrameRate.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
         for (Integer fps: fpss) {
             opciones.add(fps.toString());
         }
-        fpsSpinner = (Spinner)findViewById(R.id.spinner_fps);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
-        fpsSpinner.setAdapter(adapter);
+        videoFrameRateSpinner.setAdapter(adapter);
+    }
+
+    /** Carga las opciones para el modo time lapse */
+    protected void loadCaptureFrameRates() {
+        ArrayList<String> opciones = new ArrayList<String>();
+        opciones.add(Constants.NO_OPTION);
+        opciones.add("1");
+        opciones.add("2");
+        opciones.add("3");
+        opciones.add("4");
+        opciones.add("5");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
+        captureFrameRateSpinner.setAdapter(adapter);
     }
 
     protected void loadSharedPreferences() {
@@ -213,7 +231,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         recordAudioSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RECORD_AUDIO, false));
         lowQualitySwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_LOW_QUALIY, false));
         videoSizeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_SIZE, 0));
-        fpsSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FPS, 0));
+        videoFrameRateSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_FRAME_RATE, 0));
+        captureFrameRateSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_CAPTURE_FRAME_RATE, 0));
     }
 
     protected void saveSharedPreferences() {
@@ -227,7 +246,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putBoolean(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_LOW_QUALIY, lowQualitySwitch.isChecked());
         editor.putInt(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItemPosition());
-        editor.putInt(Constants.PREFERENCE_FPS, fpsSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_VIDEO_FRAME_RATE, videoFrameRateSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_CAPTURE_FRAME_RATE, captureFrameRateSpinner.getSelectedItemPosition());
         editor.commit();
     }
 
