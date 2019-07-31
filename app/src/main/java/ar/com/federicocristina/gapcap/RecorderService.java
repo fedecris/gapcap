@@ -9,12 +9,8 @@ import android.hardware.Camera.Size;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.IBinder;
-import android.util.Log;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.List;
 
 public class RecorderService extends Service {
 
@@ -22,7 +18,7 @@ public class RecorderService extends Service {
     private static final String TAG = "RecorderService";
     // Servicio de camara
     private static Camera mServiceCamera;
-    // Grabacion demedios
+    // Grabacion de medios
     private MediaRecorder mMediaRecorder;
 
     private int id = 6789;
@@ -32,7 +28,7 @@ public class RecorderService extends Service {
         try {
 
             // Si se selecciono utilizar la camara frontal
-            if (MainActivity.useFrontal)
+            if (MainActivity.frontalCameraSwitch.isChecked())
                 mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
             else
                 mServiceCamera = Camera.open();
@@ -89,7 +85,7 @@ public class RecorderService extends Service {
             mMediaRecorder.setCamera(mServiceCamera);
 
             // AUDIO AND VIDEO SOURCE
-            if (MainActivity.recordAudio) {
+            if (MainActivity.recordAudioSwitch.isChecked()) {
                 mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             }
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
@@ -97,7 +93,7 @@ public class RecorderService extends Service {
             // AUDIO AND VIDEO ENCODERS
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            if (MainActivity.recordAudio) {
+            if (MainActivity.recordAudioSwitch.isChecked()) {
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
             }
 
@@ -107,7 +103,7 @@ public class RecorderService extends Service {
             mMediaRecorder.setVideoSize(width, height);
 
             // ENCONDING QUALITY
-            mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(MainActivity.lowQuality ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
+            mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(MainActivity.lowQualitySwitch.isChecked() ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
 
             // FRAME RATE
             if (!(Constants.FPS_DEFAULT.equals(MainActivity.fpsSpinner.getSelectedItem().toString()))) {

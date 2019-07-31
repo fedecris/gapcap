@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,23 +35,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static FrameLayout mFrameLayoutPreview;
     // Estado de grabacion
     public static boolean mRecordingStatus = false;
-    // Usar frontal o trasera?
-    public static boolean useFrontal = false;
-    // Usar low quality?
-    public static boolean lowQuality = false;
-    // Record audio?
-    public static boolean recordAudio = true;
-    // Enviar al background?
-    public static boolean toBackground = true;
     // Tamaños de grabacion
     public static HashMap<Integer, List<android.hardware.Camera.Size>> cameraVideoSizes = null;
     // Tamaños de grabacion
     public static HashMap<Integer, List<Integer>> cameraFPS = null;
-    // Current option videoSize
-    public static int currentVideoSize = 0;
-    // Current option fps
-    public static int currentFPS = 0;
-
 
     // Start button
     public static Button startButton;
@@ -84,10 +72,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.ic_launcher);
 
-        // Botones start stop
-        startButton = findViewById(R.id.button_startService);
-        stopButton = findViewById(R.id.button_StopService);
-
         // Iniciarlizar superficie
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView1);
         mSurfaceHolder = mSurfaceView.getHolder();
@@ -96,22 +80,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mFrameLayoutPreview = (FrameLayout) findViewById(R.id.frameLayout_preview);
 
         // Recuperar componentes generales
+        startButton = findViewById(R.id.button_startService);
+        stopButton = findViewById(R.id.button_StopService);
         status = findViewById(R.id.textView_status);
         runInBackgroundSwitch = findViewById(R.id.switch_toBackground);
-        runInBackgroundSwitch.setChecked(toBackground);
         filePath = findViewById(R.id.editText_path);
         filePrefix = findViewById(R.id.editText_filePrefix);
-
-        // Calidad
         lowQualitySwitch = (Switch)findViewById(R.id.switch_lowQuality);
-        lowQualitySwitch.setChecked(lowQuality);
-
         recordAudioSwitch = (Switch)findViewById(R.id.switch_audio);
-        recordAudioSwitch.setChecked(recordAudio);
-
-        // Gestion de seleccion de camara
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
-        frontalCameraSwitch.setChecked(useFrontal);
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
         frontalCameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                                            @Override
@@ -120,15 +97,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                                                            }
                                                        });
 
-                // Modos de captura
-                loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
+        // Modos de captura
+        loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
         loadSupportedFPS(frontalCameraSwitch.isChecked());
-        // Habiliacion de boton de grabacion
+
+        // Habilitacion de boton de grabacion
         updateStartStopButtons(mRecordingStatus);
 
-        // Spinners
-        videoSizeSpinner.setSelection(currentVideoSize);
-        fpsSpinner.setSelection(currentFPS);
         fpsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -147,14 +122,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     public void iniciar(View v) {
-        // Debe usarse la camara frontal o la trasera?
-        useFrontal = frontalCameraSwitch.isChecked();
 
-        // Low quality?
-        lowQuality = lowQualitySwitch.isChecked();
-
-        // Record audio?
-        recordAudio = recordAudioSwitch.isChecked();
+        String retValue = checkPreconditions();
+        if (retValue!=null) {
+            Toast.makeText(getBaseContext(), retValue, Toast.LENGTH_LONG).show();
+            return;
+        }
 
         // Iniciar el intent con el servicio de grabacion
         Intent intent = new Intent  (this, RecorderService.class);
@@ -163,9 +136,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         ret.getClassName();
 
         // Finalizar la actividad si corresponde
-        toBackground = runInBackgroundSwitch.isChecked();
-
-        if (toBackground) {
+        if (runInBackgroundSwitch.isChecked()) {
             finish();
         }
     }
@@ -231,8 +202,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     protected void loadSharedPreferences() {
         SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        filePath.setText(preferences.getString(Constants.PREFERENCE_FILEPATH, ""));
-        filePrefix.setText(preferences.getString(Constants.PREFERENCE_FILEPREFIX, ""));
+        filePath.setText(preferences.getString(Constants.PREFERENCE_FILEPATH, "Specify a path to save the files"));
+        filePrefix.setText(preferences.getString(Constants.PREFERENCE_FILEPREFIX, "Specify a file prefix (optional)"));
         runInBackgroundSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RUNINBACKGROUND, true));
         frontalCameraSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_FRONT_CAMERA, false));
         recordAudioSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RECORD_AUDIO, false));
@@ -260,6 +231,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         super.onPause();
         saveSharedPreferences();
     }
+
+    protected String checkPreconditions() {
+        if (!Utils.recordingPathExists()) {
+            return "Specified path does not exist";
+        }
+        return null;
+    }
+
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {

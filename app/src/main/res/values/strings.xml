@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Gap Cap</string>
-    <string name="RecordingStatusActive">Recording</string>
-    <string name="RecordingStatusReady">Ready</string>
+    <string name="RecordingStatusActive">Active!</string>
+    <string name="RecordingStatusReady">Ready.</string>
     <string name="ServiceStarted">Service Started</string>
     <string name="ServiceStopped">Service Stopped</string>
     <string name="DimensionSeparator">x</string>

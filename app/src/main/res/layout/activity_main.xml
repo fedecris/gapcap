@@ -39,7 +39,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:height="30dp"
-                android:text="Ready" />
+                android:text="@string/RecordingStatusReady"
+                android:textSize="18sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -136,9 +137,7 @@
                 android:height="50dp"
                 android:autofillHints=""
                 android:ems="10"
-                android:hint="Path"
                 android:inputType="textPersonName"
-                android:text="/installer/Xtras/"
                 tools:targetApi="o" />
 
             <TextView
@@ -152,8 +151,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textPersonName"
-                android:text="cap_" />
+                android:inputType="textPersonName" />
 
         </LinearLayout>
     </ScrollView>

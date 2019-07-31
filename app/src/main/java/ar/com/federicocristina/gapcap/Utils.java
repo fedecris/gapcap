@@ -103,6 +103,15 @@ public class Utils {
         return retValue;
     }
 
+    public static boolean recordingPathExists() {
+        try {
+            File f = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePath.getText().toString());
+            return f.isDirectory();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 
 }
 
