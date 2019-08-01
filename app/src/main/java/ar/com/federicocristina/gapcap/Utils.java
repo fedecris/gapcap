@@ -103,6 +103,29 @@ public class Utils {
         return retValue;
     }
 
+    /** Retorna el soporte para foco automatico disponible (por cada camara) */
+    public static HashMap<Integer, Boolean> supportsAutoFocusMode() {
+        HashMap retValue = new HashMap<Integer, Boolean>();
+
+        Camera cam = Camera.open();
+        Camera.Parameters params = cam.getParameters();
+        List<String> supportedFocusModes = cam.getParameters().getSupportedFocusModes();
+        boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
+        retValue.put(Camera.CameraInfo.CAMERA_FACING_BACK, hasAutoFocus);
+        cam.release();
+
+        if (existsFrontalCamera()) {
+            cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            params = cam.getParameters();
+            supportedFocusModes = cam.getParameters().getSupportedFocusModes();
+            hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
+            retValue.put(Camera.CameraInfo.CAMERA_FACING_FRONT, hasAutoFocus);
+            cam.release();
+        }
+
+        return retValue;
+    }
+
     public static boolean recordingPathExists() {
         try {
             File f = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePathEditText.getText().toString());

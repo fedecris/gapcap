@@ -15,6 +15,15 @@ public class Constants {
     // Shared preferences name
     public static String SHARED_PREFERENCES_NAME                    = "prefs";
 
+    // Focus mode auto
+    public static final String OPTION_FOCUS_MODE_AUTO               = "Auto";
+    // Focus mode infinity
+    public static final String OPTION_FOCUS_MODE_INFINITY           = "Infinity";
+    // Focus mode macro
+    public static final String OPTION_FOCUS_MODE_MACRO              = "Macro";
+    // Focus mode macro
+    public static final String OPTION_FOCUS_MODE_FIXED              = "Fixed";
+
     // Shared preference: run in background
     public static String PREFERENCE_RUNINBACKGROUND                 = "RUN_IN_BACKGROUND";
     // Shared preference: front camera
@@ -44,6 +53,9 @@ public class Constants {
     // Shared preference: limit time
     public static String PREFERENCE_LIMIT_TIME                      = "LIMIT_TIME";
     // Shared preference: delay start
-    public static String PREFERENCE_DELAY_START                      = "DELAY_START";
+    public static String PREFERENCE_DELAY_START                     = "DELAY_START";
+    // Shared preference: focus mode
+    public static String PREFERENCE_FOCUS_MODE                      = "FOCUS_MODE";
+
 
 }

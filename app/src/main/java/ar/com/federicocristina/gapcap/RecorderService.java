@@ -11,6 +11,8 @@ import android.media.MediaRecorder;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import java.util.List;
+
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED;
 
@@ -70,6 +72,11 @@ public class RecorderService extends Service {
                 mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
             else
                 mServiceCamera = Camera.open();
+
+            mServiceCamera.getParameters().getSupportedFocusModes();
+            Camera.Parameters parameters = mServiceCamera.getParameters();
+            parameters.setFocusMode(getSelectedFocusMode());
+            mServiceCamera.setParameters(parameters);
 
             mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
             mServiceCamera.unlock();
@@ -192,6 +199,24 @@ public class RecorderService extends Service {
     /** Retorna el tamaño de grabacion segun la seleccion del usuario */
     protected int getRecordingVideoSize(int dimension) {
         return Integer.parseInt(MainActivity.videoSizeSpinner.getSelectedItem().toString().split("x")[dimension]);
+    }
+
+    /** Retorna el modo de enfoque */
+    protected String getSelectedFocusMode() {
+        switch (MainActivity.focusSpinner.getSelectedItem().toString()) {
+            case Constants.OPTION_FOCUS_MODE_AUTO:
+                return Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO;
+            case Constants.OPTION_FOCUS_MODE_INFINITY:
+                return Camera.Parameters.FOCUS_MODE_INFINITY;
+            case Constants.OPTION_FOCUS_MODE_MACRO:
+                return Camera.Parameters.FOCUS_MODE_MACRO;
+            case Constants.OPTION_FOCUS_MODE_FIXED:
+                return Camera.Parameters.FOCUS_MODE_FIXED;
+            default:
+                return Camera.Parameters.FOCUS_MODE_FIXED;
+        }
+
+
     }
 
 }

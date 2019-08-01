@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static HashMap<Integer, List<android.hardware.Camera.Size>> cameraVideoSizes = null;
     // Tamaños de grabacion
     public static HashMap<Integer, List<Integer>> videoFrameRate = null;
+    // Soporte Autofocus
+    public static HashMap<Integer, Boolean> autofocusSupport = null;
 
     // Start button
     public static Button startButton;
@@ -77,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static EditText limitTimeSecsEditText;
     // Demorar inicio
     public static EditText delayStartSecsEditText;
+    // Focus
+    public static Spinner focusSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,17 +117,20 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         limitSizeMBEditText = findViewById(R.id.limitSizeEditText);
         limitTimeSecsEditText = findViewById(R.id.limitTimeEditText);
         delayStartSecsEditText = findViewById(R.id.editText_delayStart);
+        focusSpinner = findViewById(R.id.spinner_focus);
 
         // Modos de captura
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
         loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
+        loadSupportedFocusModes(frontalCameraSwitch.isChecked());
         loadCaptureFrameRates();
+
 
         // Listener frontal camera switch
         frontalCameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                reLoadVideoSizesAndVideoFrameRate();
+                reLoadVideoSizesAndVideoFrameRateAndFocusModes();
             }
         });
 
@@ -182,9 +190,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         customVideoFrameRateChanged();
     }
 
-    public void reLoadVideoSizesAndVideoFrameRate() {
+    public void reLoadVideoSizesAndVideoFrameRateAndFocusModes() {
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
         loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
+        loadSupportedFocusModes(frontalCameraSwitch.isChecked());
     }
 
     public static void customVideoFrameRateChanged() {
@@ -232,6 +241,22 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         videoFrameRateSpinner.setAdapter(adapter);
     }
 
+    /** Carga las opciones de foco */
+    protected void loadSupportedFocusModes(boolean frontalCam) {
+        if (autofocusSupport==null) {
+            autofocusSupport = Utils.supportsAutoFocusMode();
+        }
+        ArrayList<String> opciones = new ArrayList<String>();
+        if (autofocusSupport.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK)) {
+            opciones.add(Constants.OPTION_FOCUS_MODE_AUTO);
+            opciones.add(Constants.OPTION_FOCUS_MODE_INFINITY);
+            opciones.add(Constants.OPTION_FOCUS_MODE_MACRO);
+        } else
+            opciones.add(Constants.OPTION_FOCUS_MODE_FIXED);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
+        focusSpinner.setAdapter(adapter);
+    }
+
     /** Carga las opciones para el modo time lapse */
     protected void loadCaptureFrameRates() {
         ArrayList<String> opciones = new ArrayList<String>();
@@ -266,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         limitSizeMBEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_SIZE, "0"));
         limitTimeSecsEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_TIME, "0"));
         delayStartSecsEditText.setText(preferences.getString(Constants.PREFERENCE_DELAY_START, "0"));
+        focusSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FOCUS_MODE, 0));
     }
 
     protected void saveSharedPreferences() {
@@ -286,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putString(Constants.PREFERENCE_LIMIT_SIZE, limitSizeMBEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_LIMIT_TIME, limitTimeSecsEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_DELAY_START, delayStartSecsEditText.getText().toString());
+        editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusSpinner.getSelectedItemPosition());
         editor.commit();
     }
 

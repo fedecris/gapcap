@@ -103,6 +103,17 @@
                 android:text="Low quality" />
 
             <TextView
+                android:id="@+id/Focus_TextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Focus mode" />
+
+            <Spinner
+                android:id="@+id/spinner_focus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
                 android:id="@+id/videoSizetextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
