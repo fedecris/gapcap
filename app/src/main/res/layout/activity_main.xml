@@ -119,10 +119,24 @@
                 android:layout_height="wrap_content"
                 android:text="Video frame rate (per second)" />
 
-            <Spinner
-                android:id="@+id/spinner_videoFrameRate"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Switch
+                    android:id="@+id/switch_customVideoFrameRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:text="@string/Custom" />
+
+                <Spinner
+                    android:id="@+id/spinner_videoFrameRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textView6"
@@ -130,10 +144,24 @@
                 android:layout_height="wrap_content"
                 android:text="Capture frame rate (video time lapse)" />
 
-            <Spinner
-                android:id="@+id/spinner_captureFrameRate"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Switch
+                    android:id="@+id/switch_customCaptureFrameRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:text="@string/Custom" />
+
+                <Spinner
+                    android:id="@+id/spinner_captureFrameRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textView2"

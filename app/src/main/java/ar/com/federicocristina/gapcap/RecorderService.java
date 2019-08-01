@@ -107,13 +107,13 @@ public class RecorderService extends Service {
             mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(MainActivity.lowQualitySwitch.isChecked() ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
 
             // Video frame rate
-            if (!(Constants.DEFAULT.equals(MainActivity.videoFrameRateSpinner.getSelectedItem().toString()))) {
+            if (MainActivity.customVideoFrameRateSwitch.isChecked()) {
                 mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.videoFrameRateSpinner.getSelectedItem().toString()));
 
             }
 
             // Capture frame rate (timelapse mode)
-            if (!(Constants.NO_OPTION.equals(MainActivity.captureFrameRateSpinner.getSelectedItem().toString()))) {
+            if (MainActivity.customCaptureFrameRateSwitch.isChecked()) {
                 mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.captureFrameRateSpinner.getSelectedItem().toString()));
             }
 
@@ -128,7 +128,7 @@ public class RecorderService extends Service {
             mMediaRecorder.start();
 
             MainActivity.mRecordingStatus = true;
-            MainActivity.updateStartStopButtons(MainActivity.mRecordingStatus);
+            MainActivity.updateComponentsStatus(MainActivity.mRecordingStatus);
 
             // Notificar sobre el inicio del servicio
             Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
@@ -164,7 +164,7 @@ public class RecorderService extends Service {
 
             stopForeground(true);
             MainActivity.mRecordingStatus = false;
-            MainActivity.updateStartStopButtons(MainActivity.mRecordingStatus);
+            MainActivity.updateComponentsStatus(MainActivity.mRecordingStatus);
 
             if (!withError) {
                 Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();

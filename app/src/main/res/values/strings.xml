@@ -5,4 +5,6 @@
     <string name="ServiceStarted">Service Started</string>
     <string name="ServiceStopped">Service Stopped</string>
     <string name="DimensionSeparator">x</string>
+    <string name="Default">Default</string>
+    <string name="Custom">Custom</string>
 </resources>
