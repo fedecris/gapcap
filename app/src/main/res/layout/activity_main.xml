@@ -103,7 +103,7 @@
                 android:text="Low quality" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/videoSizetextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Video size" />
@@ -114,12 +114,13 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/videoFrameRateTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Video frame rate (per second)" />
 
             <LinearLayout
+                android:id="@+id/VIDEO_FRAME_RATE"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -128,7 +129,7 @@
                     android:id="@+id/switch_customVideoFrameRate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0"
+                    android:layout_weight="1"
                     android:text="@string/Custom" />
 
                 <Spinner
@@ -139,12 +140,13 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/captureFrameRateTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Capture frame rate (video time lapse)" />
+                android:text="Capture frame rate (time lapse mode)" />
 
             <LinearLayout
+                android:id="@+id/CAPTURE_FRAME_RATE"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -153,7 +155,7 @@
                     android:id="@+id/switch_customCaptureFrameRate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0"
+                    android:layout_weight="1"
                     android:text="@string/Custom" />
 
                 <Spinner
@@ -164,7 +166,61 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Limit size (0 no limit)" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/limitSizeEditText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="number" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Megabytes" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Limit time (0 no limit)" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/limitTimeEditText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="number" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Seconds" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/PathView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Path" />
@@ -180,7 +236,7 @@
                 tools:targetApi="o" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/FilePrefixView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Filename prefix" />
@@ -193,7 +249,7 @@
                 android:inputType="textPersonName" />
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/FilenameTimeStamptextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Filename timestamp" />

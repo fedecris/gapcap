@@ -39,5 +39,9 @@ public class Constants {
     public static String PREFERENCE_CUSTOM_VIDEO_FRAME_RATE         = "CUSTOM_VIDEO_FRAME_RATE";
     // Shared preference: custom capture frame rate
     public static String PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE       = "CUSTOM_CAPTURE_FRAME_RATE";
+    // Shared preference: limit size
+    public static String PREFERENCE_LIMIT_SIZE                      = "LIMIT_SIZE";
+    // Shared preference: limit time
+    public static String PREFERENCE_LIMIT_TIME                      = "LIMIT_TIME";
 
 }

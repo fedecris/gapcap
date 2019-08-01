@@ -11,6 +11,9 @@ import android.media.MediaRecorder;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
+import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED;
+
 
 public class RecorderService extends Service {
 
@@ -26,16 +29,6 @@ public class RecorderService extends Service {
     @Override
     public void onCreate() {
         try {
-
-            // Si se selecciono utilizar la camara frontal
-            if (MainActivity.frontalCameraSwitch.isChecked())
-                mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
-            else
-                mServiceCamera = Camera.open();
-
-            // Adecuar segun orientacion del dispositivo
-            mServiceCamera.setDisplayOrientation(Utils.getRotationForPreview(getBaseContext()));
-
             super.onCreate();
             if (MainActivity.mRecordingStatus == false)
                 MainActivity.mRecordingStatus = startRecording();
@@ -55,8 +48,8 @@ public class RecorderService extends Service {
 
     @Override
     public void onDestroy() {
-        stopRecording(false);
         super.onDestroy();
+        stopRecording(false);
     }
 
     @Override
@@ -66,23 +59,25 @@ public class RecorderService extends Service {
 
     public boolean startRecording(){
         try {
-            Camera.Parameters params = mServiceCamera.getParameters();
-            Size preferredSize = params.getPreferredPreviewSizeForVideo();
-            params.setPreviewSize(preferredSize.width, preferredSize.height);
-            params.setPreviewFormat(PixelFormat.YCbCr_420_SP);
-            mServiceCamera.setParameters(params);
+            // Si se selecciono utilizar la camara frontal
+            if (MainActivity.frontalCameraSwitch.isChecked())
+                mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
+            else
+                mServiceCamera = Camera.open();
 
-            // Comentado. Se omite la inclusion del preview
-            //ViewGroup.LayoutParams layoutParams = MainActivity.mFrameLayoutPreview.getLayoutParams();
-            //layoutParams.height = preferredSize.height;
-            //layoutParams.width = preferredSize.width;
-            //MainActivity.mFrameLayoutPreview.setLayoutParams(layoutParams);
-
-            mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
-            //mServiceCamera.startPreview();
             mServiceCamera.unlock();
 
             mMediaRecorder = new MediaRecorder();
+            mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+                                                 @Override
+                                                 public void onInfo(MediaRecorder mr, int what, int extra) {
+                                                     // Se llego al tiempo o tamaño
+                                                     if (what == MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED || what == MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+                                                         stopService(MainActivity.instance);
+                                                     }
+                                                 }
+                                             });
+
             mMediaRecorder.setCamera(mServiceCamera);
 
             // AUDIO AND VIDEO SOURCE
@@ -109,13 +104,16 @@ public class RecorderService extends Service {
             // Video frame rate
             if (MainActivity.customVideoFrameRateSwitch.isChecked()) {
                 mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.videoFrameRateSpinner.getSelectedItem().toString()));
-
             }
 
             // Capture frame rate (timelapse mode)
             if (MainActivity.customCaptureFrameRateSwitch.isChecked()) {
                 mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.captureFrameRateSpinner.getSelectedItem().toString()));
             }
+
+            // Max file size in bytes // Max duration in seconds
+            mMediaRecorder.setMaxFileSize(Integer.parseInt(MainActivity.limitSizeMBEditText.getText().toString())*(1024*1024));
+            mMediaRecorder.setMaxDuration(Integer.parseInt(MainActivity.limitTimeSecsEditText.getText().toString())*1000);
 
             // ORIENTACION DEL DISPOSITIVO
             mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
@@ -153,31 +151,33 @@ public class RecorderService extends Service {
                 mMediaRecorder.stop();
                 mMediaRecorder.reset();
                 mMediaRecorder.release();
-            } catch (Exception e) { }
+            } catch (Exception e) {
+                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
 
             try {
                 mServiceCamera.reconnect();
-                mServiceCamera.stopPreview();
                 mServiceCamera.release();
                 mServiceCamera = null;
-            } catch (Exception e) { }
+            } catch (Exception e) {
+                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
 
             stopForeground(true);
             MainActivity.mRecordingStatus = false;
             MainActivity.updateComponentsStatus(MainActivity.mRecordingStatus);
 
+
+        } catch (RuntimeException e2) {
+            Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        } finally {
             if (!withError) {
                 Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
             } else {
                 stopSelf();
             }
-
-        } catch (RuntimeException e2) {
-            Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
-        } finally {
-            stopSelf();
         }
 
     }

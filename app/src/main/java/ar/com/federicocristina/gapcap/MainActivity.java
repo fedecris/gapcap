@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -33,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static SurfaceView mSurfaceView;
     public static SurfaceHolder mSurfaceHolder;
     public static FrameLayout mFrameLayoutPreview;
+    // Intent instance
+    public static Intent instance;
     // Estado de grabacion
     public static boolean mRecordingStatus = false;
     // Tamaños de grabacion
@@ -70,6 +71,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static TextView status;
     // Ejecutar en background?
     public static Switch runInBackgroundSwitch;
+    // Limitar tamaño
+    public static EditText limitSizeMBEditText;
+    // Limitar tiempo
+    public static EditText limitTimeSecsEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        mFrameLayoutPreview = (FrameLayout) findViewById(R.id.frameLayout_preview);
+        instance = new Intent(MainActivity.this, RecorderService.class);
 
         // Recuperar componentes generales
         startButton = findViewById(R.id.button_startService);
@@ -103,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         captureFrameRateSpinner = (Spinner)findViewById(R.id.spinner_captureFrameRate);
         frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
+        limitSizeMBEditText = findViewById(R.id.limitSizeEditText);
+        limitTimeSecsEditText = findViewById(R.id.limitTimeEditText);
 
         // Modos de captura
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
@@ -161,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     public void detener(View v) {
-        stopService(new Intent(MainActivity.this, RecorderService.class));
+        stopService(instance);
     }
 
     /** Activa o desactiva los botones segun el estado de grabacion */
@@ -249,6 +256,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         videoSizeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_SIZE, 0));
         videoFrameRateSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_FRAME_RATE, 0));
         captureFrameRateSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_CAPTURE_FRAME_RATE, 0));
+        limitSizeMBEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_SIZE, "0"));
+        limitTimeSecsEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_TIME, "0"));
     }
 
     protected void saveSharedPreferences() {
@@ -266,6 +275,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putInt(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItemPosition());
         editor.putInt(Constants.PREFERENCE_VIDEO_FRAME_RATE, videoFrameRateSpinner.getSelectedItemPosition());
         editor.putInt(Constants.PREFERENCE_CAPTURE_FRAME_RATE, captureFrameRateSpinner.getSelectedItemPosition());
+        editor.putString(Constants.PREFERENCE_LIMIT_SIZE, limitSizeMBEditText.getText().toString());
+        editor.putString(Constants.PREFERENCE_LIMIT_TIME, limitTimeSecsEditText.getText().toString());
         editor.commit();
     }
 
@@ -279,22 +290,28 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if (!Utils.recordingPathExists()) {
             return "Specified path does not exist";
         }
+        if (limitSizeMBEditText.getText().length()==0) {
+            return "Must specify size limit (or 0 if no limit)";
+        }
+        if (limitTimeSecsEditText.getText().length()==0) {
+            return "Must specify time limit (or 0 if no limit)";
+        }
         return null;
     }
 
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
+        //Toast.makeText(getBaseContext(), "SURFACE CREATED", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+        //Toast.makeText(getBaseContext(), "SURFACE CHANGED", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        //Toast.makeText(getBaseContext(), "SURFACE DESTROYED", Toast.LENGTH_SHORT).show();
     }
 }
