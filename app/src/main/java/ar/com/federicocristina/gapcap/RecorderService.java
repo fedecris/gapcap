@@ -71,6 +71,7 @@ public class RecorderService extends Service {
             else
                 mServiceCamera = Camera.open();
 
+            mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
             mServiceCamera.unlock();
 
             mMediaRecorder = new MediaRecorder();

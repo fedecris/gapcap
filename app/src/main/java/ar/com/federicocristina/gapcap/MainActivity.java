@@ -240,6 +240,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         opciones.add("3");
         opciones.add("4");
         opciones.add("5");
+        opciones.add("6");
+        opciones.add("7");
+        opciones.add("8");
+        opciones.add("9");
+        opciones.add("10");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
         captureFrameRateSpinner.setAdapter(adapter);
     }
