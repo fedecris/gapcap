@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static SurfaceHolder mSurfaceHolder;
     public static FrameLayout mFrameLayoutPreview;
     // Intent instance
-    public static Intent instance;
+    public static Intent intent;
     // Estado de grabacion
     public static boolean mRecordingStatus = false;
     // Tamaños de grabacion
@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public static EditText limitSizeMBEditText;
     // Limitar tiempo
     public static EditText limitTimeSecsEditText;
+    // Demorar inicio
+    public static EditText delayStartSecsEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        instance = new Intent(MainActivity.this, RecorderService.class);
 
         // Recuperar componentes generales
         startButton = findViewById(R.id.button_startService);
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
         limitSizeMBEditText = findViewById(R.id.limitSizeEditText);
         limitTimeSecsEditText = findViewById(R.id.limitTimeEditText);
+        delayStartSecsEditText = findViewById(R.id.editText_delayStart);
 
         // Modos de captura
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
@@ -156,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
 
         // Iniciar el intent con el servicio de grabacion
-        Intent intent = new Intent  (this, RecorderService.class);
+        intent = new Intent  (this, RecorderService.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         ComponentName ret = startService(intent);
         ret.getClassName();
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     public void detener(View v) {
-        stopService(instance);
+        stopService(intent);
     }
 
     /** Activa o desactiva los botones segun el estado de grabacion */
@@ -258,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         captureFrameRateSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_CAPTURE_FRAME_RATE, 0));
         limitSizeMBEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_SIZE, "0"));
         limitTimeSecsEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_TIME, "0"));
+        delayStartSecsEditText.setText(preferences.getString(Constants.PREFERENCE_DELAY_START, "0"));
     }
 
     protected void saveSharedPreferences() {
@@ -277,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putInt(Constants.PREFERENCE_CAPTURE_FRAME_RATE, captureFrameRateSpinner.getSelectedItemPosition());
         editor.putString(Constants.PREFERENCE_LIMIT_SIZE, limitSizeMBEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_LIMIT_TIME, limitTimeSecsEditText.getText().toString());
+        editor.putString(Constants.PREFERENCE_DELAY_START, delayStartSecsEditText.getText().toString());
         editor.commit();
     }
 
@@ -291,10 +295,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             return "Specified path does not exist";
         }
         if (limitSizeMBEditText.getText().length()==0) {
-            return "Must specify size limit (or 0 if no limit)";
+            return "Must specify size limit (or 0 for no limit)";
         }
         if (limitTimeSecsEditText.getText().length()==0) {
-            return "Must specify time limit (or 0 if no limit)";
+            return "Must specify time limit (or 0 for no limit)";
+        }
+        if (delayStartSecsEditText.getText().length()==0) {
+            return "Must specify delay start (or 0 for no delay)";
         }
         return null;
     }

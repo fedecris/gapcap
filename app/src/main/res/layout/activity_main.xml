@@ -166,7 +166,34 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/delayStartTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Delay start (0 starts inmediatly)" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/editText_delayStart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="number" />
+
+                <TextView
+                    android:id="@+id/textView_secsDelay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Seconds" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/lmitSize_textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Limit size (0 no limit)" />
@@ -185,7 +212,7 @@
                     android:inputType="number" />
 
                 <TextView
-                    android:id="@+id/textView6"
+                    android:id="@+id/MB_textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -193,7 +220,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/limitTime_textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Limit time (0 no limit)" />
@@ -212,7 +239,7 @@
                     android:inputType="number" />
 
                 <TextView
-                    android:id="@+id/textView7"
+                    android:id="@+id/secs_textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

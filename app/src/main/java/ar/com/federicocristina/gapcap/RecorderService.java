@@ -59,6 +59,12 @@ public class RecorderService extends Service {
 
     public boolean startRecording(){
         try {
+            // Demorar el inicio?
+            int delay = Integer.parseInt(MainActivity.delayStartSecsEditText.getText().toString());
+            if (delay > 0) {
+                Thread.sleep(delay * 1000);
+            }
+
             // Si se selecciono utilizar la camara frontal
             if (MainActivity.frontalCameraSwitch.isChecked())
                 mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
@@ -73,7 +79,7 @@ public class RecorderService extends Service {
                                                  public void onInfo(MediaRecorder mr, int what, int extra) {
                                                      // Se llego al tiempo o tamaño
                                                      if (what == MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED || what == MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
-                                                         stopService(MainActivity.instance);
+                                                         stopService(MainActivity.intent);
                                                      }
                                                  }
                                              });

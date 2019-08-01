@@ -43,5 +43,7 @@ public class Constants {
     public static String PREFERENCE_LIMIT_SIZE                      = "LIMIT_SIZE";
     // Shared preference: limit time
     public static String PREFERENCE_LIMIT_TIME                      = "LIMIT_TIME";
+    // Shared preference: delay start
+    public static String PREFERENCE_DELAY_START                      = "DELAY_START";
 
 }
