@@ -1,61 +1,56 @@
 package ar.com.federicocristina.gapcap;
 
-public class Constants {
+class Constants {
 
     // Nombre de la camara frontal
-    public static String FRONT_CAM_NAME                             = "Front";
+    static final String FRONT_CAM_NAME                             = "Front";
     // Nombre de la camara trasera
-    public static String BACK_CAM_NAME                              = "Back";
-
-    // Default text
-    public static String DEFAULT                                    = "<Default>";
-    // No option text
-    public static String NO_OPTION                                  = " ";
+    static final String BACK_CAM_NAME                              = "Back";
 
     // Shared preferences name
-    public static String SHARED_PREFERENCES_NAME                    = "prefs";
+    static final String SHARED_PREFERENCES_NAME                    = "prefs";
 
     // Focus mode auto
-    public static final String OPTION_FOCUS_MODE_AUTO               = "Auto";
+    static final String OPTION_FOCUS_MODE_AUTO                     = "Auto";
     // Focus mode infinity
-    public static final String OPTION_FOCUS_MODE_INFINITY           = "Infinity";
+    static final String OPTION_FOCUS_MODE_INFINITY                 = "Infinity";
     // Focus mode macro
-    public static final String OPTION_FOCUS_MODE_MACRO              = "Macro";
+    static final String OPTION_FOCUS_MODE_MACRO                    = "Macro";
     // Focus mode macro
-    public static final String OPTION_FOCUS_MODE_FIXED              = "Fixed";
+    static final String OPTION_FOCUS_MODE_FIXED                    = "Fixed";
 
     // Shared preference: run in background
-    public static String PREFERENCE_RUNINBACKGROUND                 = "RUN_IN_BACKGROUND";
+    static final String PREFERENCE_RUNINBACKGROUND                 = "RUN_IN_BACKGROUND";
     // Shared preference: front camera
-    public static String PREFERENCE_FRONT_CAMERA                    = "FRONT_CAMERA";
+    static final String PREFERENCE_FRONT_CAMERA                    = "FRONT_CAMERA";
     // Shared preference: record audio
-    public static String PREFERENCE_RECORD_AUDIO                    = "RECORD_AUDIO";
+    static final String PREFERENCE_RECORD_AUDIO                    = "RECORD_AUDIO";
     // Shared preference: low quality
-    public static String PREFERENCE_LOW_QUALIY                      = "LOW_QUALITY";
+    static final String PREFERENCE_LOW_QUALIY                      = "LOW_QUALITY";
     // Shared preference: file filePath
-    public static String PREFERENCE_FILEPATH                        = "FILE_PATH";
+    static final String PREFERENCE_FILEPATH                        = "FILE_PATH";
     // Shared preference: file prefix
-    public static String PREFERENCE_FILEPREFIX                      = "FILE_PREFIX";
+    static final String PREFERENCE_FILEPREFIX                      = "FILE_PREFIX";
     // Shared preference: file prefix
-    public static String PREFERENCE_FILETIMESTAMP                   = "FILE_TIMESTAMP";
+    static final String PREFERENCE_FILETIMESTAMP                   = "FILE_TIMESTAMP";
     // Shared preference: video size
-    public static String PREFERENCE_VIDEO_SIZE                      = "VIDEO_SIZE";
+    static final String PREFERENCE_VIDEO_SIZE                      = "VIDEO_SIZE";
     // Shared preference: video frame rate
-    public static String PREFERENCE_VIDEO_FRAME_RATE                = "VIDEO_FRAME_RATE";
+    static final String PREFERENCE_VIDEO_FRAME_RATE                = "VIDEO_FRAME_RATE";
     // Shared preference: capture frame rate
-    public static String PREFERENCE_CAPTURE_FRAME_RATE              = "CAPTURE_FRAME_RATE";
+    static final String PREFERENCE_CAPTURE_FRAME_RATE              = "CAPTURE_FRAME_RATE";
     // Shared preference: custom video frame rate
-    public static String PREFERENCE_CUSTOM_VIDEO_FRAME_RATE         = "CUSTOM_VIDEO_FRAME_RATE";
+    static final String PREFERENCE_CUSTOM_VIDEO_FRAME_RATE         = "CUSTOM_VIDEO_FRAME_RATE";
     // Shared preference: custom capture frame rate
-    public static String PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE       = "CUSTOM_CAPTURE_FRAME_RATE";
+    static final String PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE       = "CUSTOM_CAPTURE_FRAME_RATE";
     // Shared preference: limit size
-    public static String PREFERENCE_LIMIT_SIZE                      = "LIMIT_SIZE";
+    static final String PREFERENCE_LIMIT_SIZE                      = "LIMIT_SIZE";
     // Shared preference: limit time
-    public static String PREFERENCE_LIMIT_TIME                      = "LIMIT_TIME";
+    static final String PREFERENCE_LIMIT_TIME                      = "LIMIT_TIME";
     // Shared preference: delay start
-    public static String PREFERENCE_DELAY_START                     = "DELAY_START";
+    static final String PREFERENCE_DELAY_START                     = "DELAY_START";
     // Shared preference: focus mode
-    public static String PREFERENCE_FOCUS_MODE                      = "FOCUS_MODE";
+    static final String PREFERENCE_FOCUS_MODE                      = "FOCUS_MODE";
 
 
 }

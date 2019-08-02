@@ -18,14 +18,24 @@ public class Utils {
     // Tag Logcat
     private static final String TAG = "Utils";
 
+    // Features already retrieved?
+    private static boolean featuresRetrieved = false;
+    // Tamaños de grabacion
+    public static HashMap<Integer, List<android.hardware.Camera.Size>> cameraVideoSizes = new HashMap<Integer, List<Camera.Size>>();
+    // Tamaños de grabacion
+    public static HashMap<Integer, List<Integer>> videoFrameRates = new HashMap<Integer, List<Integer>>();
+    // Soporte Autofocus
+    public static HashMap<Integer, Boolean> autofocusModes = new HashMap<Integer, Boolean>();
+
+
     /** Retorna la fecha y hora actual */
-    public static String getDateTime() {
-        return new SimpleDateFormat(MainActivity.fileTimestampEditText.getText().toString()).format(Calendar.getInstance().getTime());
+    public static String getDateTime(String format) {
+        return new SimpleDateFormat(format).format(Calendar.getInstance().getTime());
     }
 
     /** Ubicacions de la grabacion */
-    public static String getRecordingFileName() {
-        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePathEditText.getText().toString() + File.separator +  MainActivity.filePrefixEditText.getText().toString() + Utils.getDateTime() + ".mp4";
+    public static String getRecordingFileName(String filePath, String filePrefix, String dateFormat) {
+        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + filePath + File.separator +  filePrefix + Utils.getDateTime(dateFormat) + ".mp4";
         // Quitar dobles slashes
         retValue = retValue.replace("//", "/");
         return retValue;
@@ -52,6 +62,15 @@ public class Utils {
         return false;
     }
 
+    /** Existe una camara trasera? */
+    public static boolean existsBackCamera() {
+        for (String camera : getCameraList()) {
+            if (Constants.BACK_CAM_NAME.equals(camera))
+                return true;
+        }
+        return false;
+    }
+
     /** Devuelve la rotacion del dispositivo en grados, a partir de la posicion inicial (horizontal, botón inferior a la derecha) */
     public static int getRotationForPreview(Context context){
         final int rotation = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
@@ -67,68 +86,48 @@ public class Utils {
         }
     }
 
-    /** Retorna el listado de posibles tamaños de captura (por cada camara) */
-    public static HashMap<Integer, List<Camera.Size>> getSupportedVideoSizes() {
-        HashMap retValue = new HashMap<Integer, List<Camera.Size>>();
+    /** Guarda las caracteristicas de cada camara en las estructuras correspondientes (por cada camara) */
+    public static void retrieveCameraFeatures() {
+        // Retrieve only once
+        if (featuresRetrieved)
+            return;
+        featuresRetrieved = true;
 
-        Camera cam = Camera.open();
-        retValue.put(Camera.CameraInfo.CAMERA_FACING_BACK, cam.getParameters().getSupportedVideoSizes()!=null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
-        cam.release();
-
+        // == BACK CAMERA ==
         if (existsFrontalCamera()) {
-            cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-            retValue.put(Camera.CameraInfo.CAMERA_FACING_FRONT, cam.getParameters().getSupportedVideoSizes() != null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
+            Camera cam = Camera.open();
+            Camera.Parameters params = cam.getParameters();
+            // Video sizes
+            cameraVideoSizes.put(Camera.CameraInfo.CAMERA_FACING_BACK, cam.getParameters().getSupportedVideoSizes() != null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
+            // Video frame rates
+            videoFrameRates.put(Camera.CameraInfo.CAMERA_FACING_BACK, params.getSupportedPreviewFrameRates());
+            // Autofocus modes
+            List<String> supportedFocusModes = cam.getParameters().getSupportedFocusModes();
+            boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
+            autofocusModes.put(Camera.CameraInfo.CAMERA_FACING_BACK, hasAutoFocus);
             cam.release();
         }
 
-        return retValue;
-    }
-
-    /** Retorna los FPS disponibles (por cada camara) */
-    public static HashMap<Integer, List<Integer>> getSupportedFps() {
-        HashMap retValue = new HashMap<Integer, List<Integer>>();
-
-        Camera cam = Camera.open();
-        Camera.Parameters params = cam.getParameters();
-        retValue.put(Camera.CameraInfo.CAMERA_FACING_BACK, params.getSupportedPreviewFrameRates());
-        cam.release();
-
+        // == FRONTAL CAMERA ==
         if (existsFrontalCamera()) {
-            cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-            params = cam.getParameters();
-            retValue.put(Camera.CameraInfo.CAMERA_FACING_FRONT, params.getSupportedPreviewFrameRates());
+            Camera cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            Camera.Parameters params = cam.getParameters();
+            // Video sizes
+            cameraVideoSizes.put(Camera.CameraInfo.CAMERA_FACING_FRONT, cam.getParameters().getSupportedVideoSizes() != null ? cam.getParameters().getSupportedVideoSizes() : cam.getParameters().getSupportedPreviewSizes());
+            // Video frame rates
+            videoFrameRates.put(Camera.CameraInfo.CAMERA_FACING_FRONT, params.getSupportedPreviewFrameRates());
+            // Autofocus modes
+            List<String> supportedFocusModes = cam.getParameters().getSupportedFocusModes();
+            boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
+            autofocusModes.put(Camera.CameraInfo.CAMERA_FACING_FRONT, hasAutoFocus);
             cam.release();
         }
-
-        return retValue;
     }
 
-    /** Retorna el soporte para foco automatico disponible (por cada camara) */
-    public static HashMap<Integer, Boolean> supportsAutoFocusMode() {
-        HashMap retValue = new HashMap<Integer, Boolean>();
-
-        Camera cam = Camera.open();
-        Camera.Parameters params = cam.getParameters();
-        List<String> supportedFocusModes = cam.getParameters().getSupportedFocusModes();
-        boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
-        retValue.put(Camera.CameraInfo.CAMERA_FACING_BACK, hasAutoFocus);
-        cam.release();
-
-        if (existsFrontalCamera()) {
-            cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-            params = cam.getParameters();
-            supportedFocusModes = cam.getParameters().getSupportedFocusModes();
-            hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
-            retValue.put(Camera.CameraInfo.CAMERA_FACING_FRONT, hasAutoFocus);
-            cam.release();
-        }
-
-        return retValue;
-    }
-
-    public static boolean recordingPathExists() {
+    /** Verifica si existe el path especificado en donde almacenar la grabacion */
+    public static boolean recordingPathExists(String path) {
         try {
-            File f = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + MainActivity.filePathEditText.getText().toString());
+            File f = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + path);
             return f.isDirectory();
         } catch (Exception e) {
             return false;

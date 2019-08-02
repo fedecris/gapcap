@@ -3,15 +3,13 @@ package ar.com.federicocristina.gapcap;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.hardware.Camera.Size;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
-
-import java.util.List;
 
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED;
@@ -25,22 +23,46 @@ public class RecorderService extends Service {
     private static Camera mServiceCamera;
     // Grabacion de medios
     private MediaRecorder mMediaRecorder;
-
+    // Estado de grabacion
+    public static boolean mRecordingStatus = false;
+    // ID de referencia
     private int id = 6789;
+
+    // Delay?
+    int delayStartSecs = 0;
+    // Use frontal cam?
+    boolean frontalCamera = false;
+    // Record Audio?
+    boolean recordAudio = true;
+    // Low quality
+    boolean lowQuality = false;
+    // Video Frame rate
+    boolean customVideoFrameRate = false;
+    int videoFrameRate = 30;
+    // Capture Frame rate
+    boolean customCaptureFrameRate = false;
+    int captureFrameRate = 30;
+    // Limit File Size
+    int limitSizeMB = 0;
+    // Limit Record Time
+    int limitTimeSecs = 0;
+    // Vide size
+    String videoSize = "640x480";
+    // Focus mode
+    String focusMode = "Auto";
+    // File path
+    String filePath;
+    // File prefix
+    String filePrefix;
+    // File date format
+    String fileDateFormat;
 
     @Override
     public void onCreate() {
-        try {
-            super.onCreate();
-            if (MainActivity.mRecordingStatus == false)
-                MainActivity.mRecordingStatus = startRecording();
-        } catch (RuntimeException e) {
-            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-        } catch (Exception e2) {
-            Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
-        }
+
 
     }
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -56,19 +78,50 @@ public class RecorderService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStart(intent, startId);
+        try {
+            super.onCreate();
+
+            Bundle extras = intent.getExtras();
+            if (extras == null) {
+                throw new Exception("Failed to start service");
+            } else {
+                delayStartSecs = (Integer)extras.get(Constants.PREFERENCE_DELAY_START);
+                frontalCamera = (Boolean)extras.get(Constants.PREFERENCE_FRONT_CAMERA);
+                recordAudio = (Boolean)extras.get(Constants.PREFERENCE_RECORD_AUDIO);
+                lowQuality = (Boolean)extras.get(Constants.PREFERENCE_LOW_QUALIY);
+                customVideoFrameRate = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE);
+                videoFrameRate = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE);
+                customCaptureFrameRate = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE);
+                captureFrameRate = (Integer)extras.get(Constants.PREFERENCE_CAPTURE_FRAME_RATE);
+                limitSizeMB = (Integer)extras.get(Constants.PREFERENCE_LIMIT_SIZE);
+                limitTimeSecs = (Integer)extras.get(Constants.PREFERENCE_LIMIT_TIME);
+                videoSize = (String)extras.get(Constants.PREFERENCE_VIDEO_SIZE);
+                focusMode =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE);
+                filePath =  (String)extras.get(Constants.PREFERENCE_FILEPATH);
+                filePrefix =  (String)extras.get(Constants.PREFERENCE_FILEPREFIX);
+                fileDateFormat =  (String)extras.get(Constants.PREFERENCE_FILETIMESTAMP);
+            }
+            if (mRecordingStatus == false)
+                mRecordingStatus = startRecording();
+        } catch (RuntimeException e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (Exception e2) {
+            Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
         return START_STICKY;
     }
 
     public boolean startRecording(){
         try {
             // Demorar el inicio?
-            int delay = Integer.parseInt(MainActivity.delayStartSecsEditText.getText().toString());
-            if (delay > 0) {
-                Thread.sleep(delay * 1000);
+            if (delayStartSecs > 0) {
+                Thread.sleep(delayStartSecs * 1000);
             }
 
             // Si se selecciono utilizar la camara frontal
-            if (MainActivity.frontalCameraSwitch.isChecked())
+            if (frontalCamera)
                 mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
             else
                 mServiceCamera = Camera.open();
@@ -87,6 +140,7 @@ public class RecorderService extends Service {
                                                  public void onInfo(MediaRecorder mr, int what, int extra) {
                                                      // Se llego al tiempo o tamaño
                                                      if (what == MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED || what == MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+                                                         // TODO: NOTIFICAR
                                                          stopService(MainActivity.intent);
                                                      }
                                                  }
@@ -95,7 +149,7 @@ public class RecorderService extends Service {
             mMediaRecorder.setCamera(mServiceCamera);
 
             // AUDIO AND VIDEO SOURCE
-            if (MainActivity.recordAudioSwitch.isChecked()) {
+            if (recordAudio) {
                 mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             }
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
@@ -103,44 +157,42 @@ public class RecorderService extends Service {
             // AUDIO AND VIDEO ENCODERS
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-            if (MainActivity.recordAudioSwitch.isChecked()) {
+            if (recordAudio) {
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
             }
 
             // VIDEO SIZE
-            int width = getRecordingVideoSize(0);
-            int height = getRecordingVideoSize(1);
-            mMediaRecorder.setVideoSize(width, height);
+            mMediaRecorder.setVideoSize(getRecordingVideoSize(0), getRecordingVideoSize(1));
 
             // ENCONDING QUALITY
-            mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(MainActivity.lowQualitySwitch.isChecked() ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
+            mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(lowQuality ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
 
             // Video frame rate
-            if (MainActivity.customVideoFrameRateSwitch.isChecked()) {
-                mMediaRecorder.setVideoFrameRate(Integer.parseInt(MainActivity.videoFrameRateSpinner.getSelectedItem().toString()));
+            if (customVideoFrameRate) {
+                mMediaRecorder.setVideoFrameRate(videoFrameRate);
             }
 
             // Capture frame rate (timelapse mode)
-            if (MainActivity.customCaptureFrameRateSwitch.isChecked()) {
-                mMediaRecorder.setCaptureRate(Integer.parseInt(MainActivity.captureFrameRateSpinner.getSelectedItem().toString()));
+            if (customCaptureFrameRate) {
+                mMediaRecorder.setCaptureRate(captureFrameRate);
             }
 
             // Max file size in bytes // Max duration in seconds
-            mMediaRecorder.setMaxFileSize(Integer.parseInt(MainActivity.limitSizeMBEditText.getText().toString())*(1024*1024));
-            mMediaRecorder.setMaxDuration(Integer.parseInt(MainActivity.limitTimeSecsEditText.getText().toString())*1000);
+            mMediaRecorder.setMaxFileSize(limitSizeMB*(1024*1024));
+            mMediaRecorder.setMaxDuration(limitTimeSecs*1000);
 
             // ORIENTACION DEL DISPOSITIVO
             mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
             mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext()));
 
             // OUTPUT FILE
-            mMediaRecorder.setOutputFile(Utils.getRecordingFileName());
+            mMediaRecorder.setOutputFile(Utils.getRecordingFileName(filePath, filePrefix, fileDateFormat));
 
             mMediaRecorder.prepare();
             mMediaRecorder.start();
 
-            MainActivity.mRecordingStatus = true;
-            MainActivity.updateComponentsStatus(MainActivity.mRecordingStatus);
+            mRecordingStatus = true;
+//            MainActivity.updateComponentsStatus(mRecordingStatus);
 
             // Notificar sobre el inicio del servicio
             Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
@@ -178,8 +230,8 @@ public class RecorderService extends Service {
             }
 
             stopForeground(true);
-            MainActivity.mRecordingStatus = false;
-            MainActivity.updateComponentsStatus(MainActivity.mRecordingStatus);
+            mRecordingStatus = false;
+//            MainActivity.updateComponentsStatus(mRecordingStatus);
 
 
         } catch (RuntimeException e2) {
@@ -198,12 +250,12 @@ public class RecorderService extends Service {
 
     /** Retorna el tamaño de grabacion segun la seleccion del usuario */
     protected int getRecordingVideoSize(int dimension) {
-        return Integer.parseInt(MainActivity.videoSizeSpinner.getSelectedItem().toString().split("x")[dimension]);
+        return Integer.parseInt(videoSize.split("x")[dimension]);
     }
 
     /** Retorna el modo de enfoque */
     protected String getSelectedFocusMode() {
-        switch (MainActivity.focusSpinner.getSelectedItem().toString()) {
+        switch (focusMode) {
             case Constants.OPTION_FOCUS_MODE_AUTO:
                 return Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO;
             case Constants.OPTION_FOCUS_MODE_INFINITY:
@@ -215,8 +267,6 @@ public class RecorderService extends Service {
             default:
                 return Camera.Parameters.FOCUS_MODE_FIXED;
         }
-
-
     }
 
 }

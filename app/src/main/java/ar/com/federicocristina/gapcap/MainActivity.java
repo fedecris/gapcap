@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -32,56 +31,47 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Surface para la reproduccion de video
     public static SurfaceView mSurfaceView;
     public static SurfaceHolder mSurfaceHolder;
-    public static FrameLayout mFrameLayoutPreview;
     // Intent instance
     public static Intent intent;
-    // Estado de grabacion
-    public static boolean mRecordingStatus = false;
-    // Tamaños de grabacion
-    public static HashMap<Integer, List<android.hardware.Camera.Size>> cameraVideoSizes = null;
-    // Tamaños de grabacion
-    public static HashMap<Integer, List<Integer>> videoFrameRate = null;
-    // Soporte Autofocus
-    public static HashMap<Integer, Boolean> autofocusSupport = null;
 
     // Start button
-    public static Button startButton;
+    public Button startButton;
     // Stop button
-    public static Button stopButton;
+    public Button stopButton;
     // Path de grabacion
-    public static EditText filePathEditText;
+    public EditText filePathEditText;
     // Path de grabacion
-    public static EditText filePrefixEditText;
+    public EditText filePrefixEditText;
     // Timestamp del archivo
-    public static EditText fileTimestampEditText;
+    public EditText fileDateFormatEditText;
     // Camara frontal?
-    public static Switch frontalCameraSwitch;
+    public Switch frontalCameraSwitch;
     // Usar calidad baja?
-    public static Switch lowQualitySwitch;
+    public Switch lowQualitySwitch;
     // Grabar audio?
-    public static Switch recordAudioSwitch;
+    public Switch recordAudioSwitch;
     // Video Size
-    public static Spinner videoSizeSpinner;
+    public Spinner videoSizeSpinner;
     // Custom Video Frame Rate
-    public static Switch customVideoFrameRateSwitch;
+    public Switch customVideoFrameRateSwitch;
     // Video Frame Rate
-    public static Spinner videoFrameRateSpinner;
+    public Spinner videoFrameRateSpinner;
     // Custom Capture Frame Rate
-    public static Switch customCaptureFrameRateSwitch;
+    public Switch customCaptureFrameRateSwitch;
     // Capture Frame Rate
-    public static Spinner captureFrameRateSpinner;
+    public Spinner captureFrameRateSpinner;
     // Estado de grabacion
-    public static TextView status;
+    public TextView status;
     // Ejecutar en background?
-    public static Switch runInBackgroundSwitch;
+    public Switch runInBackgroundSwitch;
     // Limitar tamaño
-    public static EditText limitSizeMBEditText;
+    public EditText limitSizeMBEditText;
     // Limitar tiempo
-    public static EditText limitTimeSecsEditText;
+    public EditText limitTimeSecsEditText;
     // Demorar inicio
-    public static EditText delayStartSecsEditText;
+    public EditText delayStartSecsEditText;
     // Focus
-    public static Spinner focusSpinner;
+    public Spinner focusModeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,21 +95,22 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         runInBackgroundSwitch = findViewById(R.id.switch_toBackground);
         filePathEditText = findViewById(R.id.editText_path);
         filePrefixEditText = findViewById(R.id.editText_filePrefix);
-        fileTimestampEditText = findViewById(R.id.editText_filenameTimestamp);
-        lowQualitySwitch = (Switch)findViewById(R.id.switch_lowQuality);
-        recordAudioSwitch = (Switch)findViewById(R.id.switch_audio);
-        customVideoFrameRateSwitch = (Switch)findViewById(R.id.switch_customVideoFrameRate);
-        customCaptureFrameRateSwitch = (Switch)findViewById(R.id.switch_customCaptureFrameRate);
-        videoFrameRateSpinner = (Spinner)findViewById(R.id.spinner_videoFrameRate);
-        captureFrameRateSpinner = (Spinner)findViewById(R.id.spinner_captureFrameRate);
-        frontalCameraSwitch = (Switch)findViewById(R.id.switch_frontalCamera);
+        fileDateFormatEditText = findViewById(R.id.editText_filenameTimestamp);
+        lowQualitySwitch = findViewById(R.id.switch_lowQuality);
+        recordAudioSwitch = findViewById(R.id.switch_audio);
+        customVideoFrameRateSwitch = findViewById(R.id.switch_customVideoFrameRate);
+        customCaptureFrameRateSwitch = findViewById(R.id.switch_customCaptureFrameRate);
+        videoFrameRateSpinner = findViewById(R.id.spinner_videoFrameRate);
+        captureFrameRateSpinner = findViewById(R.id.spinner_captureFrameRate);
+        frontalCameraSwitch = findViewById(R.id.switch_frontalCamera);
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
         limitSizeMBEditText = findViewById(R.id.limitSizeEditText);
         limitTimeSecsEditText = findViewById(R.id.limitTimeEditText);
         delayStartSecsEditText = findViewById(R.id.editText_delayStart);
-        focusSpinner = findViewById(R.id.spinner_focus);
+        focusModeSpinner = findViewById(R.id.spinner_focus);
 
-        // Modos de captura
+        // Recuperar la configuracion de las camaras y cargar los componentes visuales
+        Utils.retrieveCameraFeatures();
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
         loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
         loadSupportedFocusModes(frontalCameraSwitch.isChecked());
@@ -152,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         // Status actual de componentes
         loadSharedPreferences();
-        updateComponentsStatus(mRecordingStatus);
+        updateComponentsStatus(RecorderService.mRecordingStatus);
 
 
     }
@@ -165,9 +156,26 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             return;
         }
 
+        updateComponentsStatus(true);
+
         // Iniciar el intent con el servicio de grabacion
         intent = new Intent  (this, RecorderService.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(Constants.PREFERENCE_DELAY_START, Integer.parseInt(delayStartSecsEditText.getText().toString()));
+        intent.putExtra(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
+        intent.putExtra(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
+        intent.putExtra(Constants.PREFERENCE_LOW_QUALIY, lowQualitySwitch.isChecked());
+        intent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, customVideoFrameRateSwitch.isChecked());
+        intent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE, Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString()));
+        intent.putExtra(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked());
+        intent.putExtra(Constants.PREFERENCE_CAPTURE_FRAME_RATE, Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()));
+        intent.putExtra(Constants.PREFERENCE_LIMIT_SIZE, Integer.parseInt(limitSizeMBEditText.getText().toString()));
+        intent.putExtra(Constants.PREFERENCE_LIMIT_TIME, Integer.parseInt(limitTimeSecsEditText.getText().toString()));
+        intent.putExtra(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItem().toString());
+        intent.putExtra(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItem().toString());
+        intent.putExtra(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
+        intent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
+        intent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
         ComponentName ret = startService(intent);
         ret.getClassName();
 
@@ -178,13 +186,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     public void detener(View v) {
+        updateComponentsStatus(false);
         stopService(intent);
     }
 
     /** Activa o desactiva los botones segun el estado de grabacion */
-    public static void updateComponentsStatus(boolean recording) {
-        ((Button)startButton).setEnabled(!recording);
-        ((Button)stopButton).setEnabled(recording);
+    public void updateComponentsStatus(boolean recording) {
+        (startButton).setEnabled(!recording);
+        (stopButton).setEnabled(recording);
         status.setText(recording ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
         customCaptureFrameRateChanged();
         customVideoFrameRateChanged();
@@ -196,28 +205,26 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         loadSupportedFocusModes(frontalCameraSwitch.isChecked());
     }
 
-    public static void customVideoFrameRateChanged() {
+    public void customVideoFrameRateChanged() {
         // Video frame rate custom
         videoFrameRateSpinner.setEnabled(customVideoFrameRateSwitch.isChecked());
     }
 
-    public static void customCaptureFrameRateChanged() {
+    public void customCaptureFrameRateChanged() {
         // Si se especifica modo time lapse, entonces desactivar el sonido
         captureFrameRateSpinner.setEnabled(customCaptureFrameRateSwitch.isChecked());
         recordAudioSwitch.setEnabled(!customCaptureFrameRateSwitch.isChecked());
+        customVideoFrameRateSwitch.setEnabled(!customCaptureFrameRateSwitch.isChecked());
         if (customCaptureFrameRateSwitch.isChecked()) {
             recordAudioSwitch.setChecked(false);
+            customVideoFrameRateSwitch.setChecked(true);
         }
     }
 
     /** Carga el spinner de opciones de tamaño de grabacion */
     protected void loadSupportedVideoSizes(boolean frontalCam) {
-        if (cameraVideoSizes == null) {
-            cameraVideoSizes = Utils.getSupportedVideoSizes();
-        }
-
         ArrayList<String> opciones = new ArrayList<String>();
-        List<Camera.Size> sizes = cameraVideoSizes.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
+        List<Camera.Size> sizes = Utils.cameraVideoSizes.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
         for (Camera.Size size : sizes) {
             opciones.add(size.width + "x" + size.height);
         }
@@ -228,12 +235,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     /** Carga el spinner de opciones de tamaño de grabacion */
     protected void loadSupportedVideoFrameRates(boolean frontalCam) {
-        if (videoFrameRate == null) {
-            videoFrameRate = Utils.getSupportedFps();
-        }
-
         ArrayList<String> opciones = new ArrayList<String>();
-        List<Integer> fpss = videoFrameRate.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
+        List<Integer> fpss = Utils.videoFrameRates.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
         for (Integer fps: fpss) {
             opciones.add(fps.toString());
         }
@@ -243,42 +246,32 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     /** Carga las opciones de foco */
     protected void loadSupportedFocusModes(boolean frontalCam) {
-        if (autofocusSupport==null) {
-            autofocusSupport = Utils.supportsAutoFocusMode();
-        }
         ArrayList<String> opciones = new ArrayList<String>();
-        if (autofocusSupport.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK)) {
+        if (Utils.autofocusModes.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK)) {
             opciones.add(Constants.OPTION_FOCUS_MODE_AUTO);
             opciones.add(Constants.OPTION_FOCUS_MODE_INFINITY);
             opciones.add(Constants.OPTION_FOCUS_MODE_MACRO);
         } else
             opciones.add(Constants.OPTION_FOCUS_MODE_FIXED);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
-        focusSpinner.setAdapter(adapter);
+        focusModeSpinner.setAdapter(adapter);
     }
 
     /** Carga las opciones para el modo time lapse */
     protected void loadCaptureFrameRates() {
         ArrayList<String> opciones = new ArrayList<String>();
-        opciones.add("1");
-        opciones.add("2");
-        opciones.add("3");
-        opciones.add("4");
-        opciones.add("5");
-        opciones.add("6");
-        opciones.add("7");
-        opciones.add("8");
-        opciones.add("9");
-        opciones.add("10");
+        for (int i=1; i<=10; i++)
+            opciones.add(""+i);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
         captureFrameRateSpinner.setAdapter(adapter);
     }
 
+    /** Carga de configuración */
     protected void loadSharedPreferences() {
         SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         filePathEditText.setText(preferences.getString(Constants.PREFERENCE_FILEPATH, "Specify a path to save the files"));
         filePrefixEditText.setText(preferences.getString(Constants.PREFERENCE_FILEPREFIX, "Specify a file prefix (optional)"));
-        fileTimestampEditText.setText(preferences.getString(Constants.PREFERENCE_FILETIMESTAMP, "yyyyMMdd_HHmmss"));
+        fileDateFormatEditText.setText(preferences.getString(Constants.PREFERENCE_FILETIMESTAMP, "yyyyMMdd_HHmmss"));
         runInBackgroundSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RUNINBACKGROUND, true));
         frontalCameraSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_FRONT_CAMERA, false));
         recordAudioSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RECORD_AUDIO, false));
@@ -291,15 +284,16 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         limitSizeMBEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_SIZE, "0"));
         limitTimeSecsEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_TIME, "0"));
         delayStartSecsEditText.setText(preferences.getString(Constants.PREFERENCE_DELAY_START, "0"));
-        focusSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FOCUS_MODE, 0));
+        focusModeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FOCUS_MODE, 0));
     }
 
+    /** Almacenamiento de configuración */
     protected void saveSharedPreferences() {
         SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
-        editor.putString(Constants.PREFERENCE_FILETIMESTAMP, fileTimestampEditText.getText().toString());
+        editor.putString(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
         editor.putBoolean(Constants.PREFERENCE_RUNINBACKGROUND, runInBackgroundSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
@@ -312,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putString(Constants.PREFERENCE_LIMIT_SIZE, limitSizeMBEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_LIMIT_TIME, limitTimeSecsEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_DELAY_START, delayStartSecsEditText.getText().toString());
-        editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItemPosition());
         editor.commit();
     }
 
@@ -322,8 +316,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         saveSharedPreferences();
     }
 
+    /** Validaciones preliminares a la grabacion */
     protected String checkPreconditions() {
-        if (!Utils.recordingPathExists()) {
+        if (!Utils.recordingPathExists(filePathEditText.getText().toString())) {
             return "Specified path does not exist";
         }
         if (limitSizeMBEditText.getText().length()==0) {
