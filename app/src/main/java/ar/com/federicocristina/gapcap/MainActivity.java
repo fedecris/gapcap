@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Camara frontal?
     public Switch frontalCameraSwitch;
     // Usar calidad baja?
-    public Switch lowQualitySwitch;
+    public SeekBar qualitySeekBar;
     // Grabar audio?
     public Switch recordAudioSwitch;
     // Video Size
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         filePathEditText = findViewById(R.id.editText_path);
         filePrefixEditText = findViewById(R.id.editText_filePrefix);
         fileDateFormatEditText = findViewById(R.id.editText_filenameTimestamp);
-        lowQualitySwitch = findViewById(R.id.switch_lowQuality);
+        qualitySeekBar = findViewById(R.id.seekBar_quality);
         recordAudioSwitch = findViewById(R.id.switch_audio);
         customVideoFrameRateSwitch = findViewById(R.id.switch_customVideoFrameRate);
         customCaptureFrameRateSwitch = findViewById(R.id.switch_customCaptureFrameRate);
@@ -116,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
         loadSupportedFocusModes(frontalCameraSwitch.isChecked());
         loadCaptureFrameRates();
-
 
         // Listener frontal camera switch
         frontalCameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         intent.putExtra(Constants.PREFERENCE_DELAY_START, Integer.parseInt(delayStartSecsEditText.getText().toString()));
         intent.putExtra(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
         intent.putExtra(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
-        intent.putExtra(Constants.PREFERENCE_LOW_QUALIY, lowQualitySwitch.isChecked());
+        intent.putExtra(Constants.PREFERENCE_QUALIY, qualitySeekBar.getProgress());
         intent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, customVideoFrameRateSwitch.isChecked());
         intent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE, Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString()));
         intent.putExtra(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked());
@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         runInBackgroundSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RUNINBACKGROUND, true));
         frontalCameraSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_FRONT_CAMERA, false));
         recordAudioSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RECORD_AUDIO, false));
-        lowQualitySwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_LOW_QUALIY, false));
+        qualitySeekBar.setProgress(preferences.getInt(Constants.PREFERENCE_QUALIY, 10));
         customVideoFrameRateSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, false));
         customCaptureFrameRateSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, false));
         videoSizeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_SIZE, 0));
@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putBoolean(Constants.PREFERENCE_RUNINBACKGROUND, runInBackgroundSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
-        editor.putBoolean(Constants.PREFERENCE_LOW_QUALIY, lowQualitySwitch.isChecked());
+        editor.putInt(Constants.PREFERENCE_QUALIY, qualitySeekBar.getProgress());
         editor.putBoolean(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, customVideoFrameRateSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked());
         editor.putInt(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItemPosition());
@@ -332,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if (delayStartSecsEditText.getText().length()==0) {
             return "Must specify delay start (or 0 for no delay)";
         }
-        if (customCaptureFrameRateSwitch.isEnabled() && Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()) > Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString())) {
+        if (customCaptureFrameRateSwitch.isChecked() && Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()) > Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString())) {
             return "Capture frame rate must be lower or equal to video frame rate";
         }
         return null;
@@ -357,9 +357,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Manejador de notificaciones por parte del servicio.
     class ResponseHandler extends Handler {
         @Override public void handleMessage(Message message) {
+            StringBuffer content = new StringBuffer();
+            content.append("Error: ");
+            content.append(message.obj != null ? message.obj.toString(): "unknown error.");
             if (message.what==Constants.NOTIFY_ERROR) {
                 updateComponentsStatus(false);
-                Toast.makeText(getBaseContext(), message.obj.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), content.toString(), Toast.LENGTH_SHORT).show();
             } else if (message.what==Constants.NOTIFY_START) {
                 updateComponentsStatus(true);
                 Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();

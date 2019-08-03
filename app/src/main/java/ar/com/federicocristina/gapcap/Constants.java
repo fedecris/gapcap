@@ -4,13 +4,14 @@ class Constants {
 
     // Key para intercambio del messenger
     static final String MESSENGER                                  = "Messenger";
-
     // Notificacion de Error
-    static final int NOTIFY_ERROR                                   = -1;
+    static final int NOTIFY_ERROR                                  = -1;
     // Notificacion de inicio de servicio
-    static final int NOTIFY_START                                   = 1;
+    static final int NOTIFY_START                                  = 1;
     // Notificacion de detencion de servicio
-    static final int NOTIFY_STOP                                    = 0;
+    static final int NOTIFY_STOP                                   = 0;
+    // Max possible bit rate
+    static final int ENCODING_BITRATE_STEP                          = 500000;
 
     // Nombre de la camara frontal
     static final String FRONT_CAM_NAME                             = "Front";
@@ -36,7 +37,7 @@ class Constants {
     // Shared preference: record audio
     static final String PREFERENCE_RECORD_AUDIO                    = "RECORD_AUDIO";
     // Shared preference: low quality
-    static final String PREFERENCE_LOW_QUALIY                      = "LOW_QUALITY";
+    static final String PREFERENCE_QUALIY                          = "QUALITY";
     // Shared preference: file filePath
     static final String PREFERENCE_FILEPATH                        = "FILE_PATH";
     // Shared preference: file prefix

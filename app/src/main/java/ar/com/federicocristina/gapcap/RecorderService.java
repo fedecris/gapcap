@@ -38,7 +38,7 @@ public class RecorderService extends Service {
     // Record Audio?
     boolean recordAudio = true;
     // Low quality
-    boolean lowQuality = false;
+    int quality = 10;
     // Video Frame rate
     boolean customVideoFrameRate = false;
     int videoFrameRate = 30;
@@ -93,7 +93,7 @@ public class RecorderService extends Service {
                 delayStartSecs = (Integer)extras.get(Constants.PREFERENCE_DELAY_START);
                 frontalCamera = (Boolean)extras.get(Constants.PREFERENCE_FRONT_CAMERA);
                 recordAudio = (Boolean)extras.get(Constants.PREFERENCE_RECORD_AUDIO);
-                lowQuality = (Boolean)extras.get(Constants.PREFERENCE_LOW_QUALIY);
+                quality = (Integer)extras.get(Constants.PREFERENCE_QUALIY);
                 customVideoFrameRate = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE);
                 videoFrameRate = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE);
                 customCaptureFrameRate = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE);
@@ -168,7 +168,7 @@ public class RecorderService extends Service {
             mMediaRecorder.setVideoSize(getRecordingVideoSize(0), getRecordingVideoSize(1));
 
             // ENCONDING QUALITY
-            mMediaRecorder.setVideoEncodingBitRate(CamcorderProfile.get(lowQuality ? CamcorderProfile.QUALITY_LOW : CamcorderProfile.QUALITY_HIGH).videoBitRate);
+            mMediaRecorder.setVideoEncodingBitRate(Constants.ENCODING_BITRATE_STEP * quality + 1);
 
             // Video frame rate
             if (customVideoFrameRate) {
@@ -234,18 +234,10 @@ public class RecorderService extends Service {
             stopForeground(true);
             mRecordingStatus = false;
             notifyEvent(Constants.NOTIFY_STOP, null);
-
-
         } catch (RuntimeException e2) {
             notifyEvent(Constants.NOTIFY_ERROR, e2.getMessage());
         } catch (Exception e) {
             notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
-        } finally {
-            if (!withError) {
-                notifyEvent(Constants.NOTIFY_STOP, null);
-            } else {
-                stopSelf();
-            }
         }
 
     }
