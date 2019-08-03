@@ -125,32 +125,6 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:id="@+id/videoFrameRateTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Video frame rate (per second)" />
-
-            <LinearLayout
-                android:id="@+id/VIDEO_FRAME_RATE"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <Switch
-                    android:id="@+id/switch_customVideoFrameRate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/Custom" />
-
-                <Spinner
-                    android:id="@+id/spinner_videoFrameRate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-            </LinearLayout>
-
-            <TextView
                 android:id="@+id/captureFrameRateTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -171,6 +145,33 @@
 
                 <Spinner
                     android:id="@+id/spinner_captureFrameRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/videoFrameRateTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Video frame rate (per second)" />
+
+            <LinearLayout
+                android:id="@+id/VIDEO_FRAME_RATE"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Switch
+                    android:id="@+id/switch_customVideoFrameRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/Custom" />
+
+                <Spinner
+                    android:id="@+id/spinner_videoFrameRate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />

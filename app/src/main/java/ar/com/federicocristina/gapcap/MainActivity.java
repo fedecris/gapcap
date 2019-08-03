@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     /** Activa o desactiva los botones segun el estado de grabacion */
     public void updateComponentsStatus(boolean recording) {
+        customVideoFrameRateSwitch.setEnabled(false); // Se habilita o no dependiendo del timelapse mode
         (startButton).setEnabled(!recording);
         (stopButton).setEnabled(recording);
         status.setText(recording ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
@@ -216,10 +217,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         // Si se especifica modo time lapse, entonces desactivar el sonido
         captureFrameRateSpinner.setEnabled(customCaptureFrameRateSwitch.isChecked());
         recordAudioSwitch.setEnabled(!customCaptureFrameRateSwitch.isChecked());
-        customVideoFrameRateSwitch.setEnabled(!customCaptureFrameRateSwitch.isChecked());
+        customVideoFrameRateSwitch.setChecked(customCaptureFrameRateSwitch.isChecked());
         if (customCaptureFrameRateSwitch.isChecked()) {
             recordAudioSwitch.setChecked(false);
-            customVideoFrameRateSwitch.setChecked(true);
         }
     }
 
@@ -331,6 +331,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
         if (delayStartSecsEditText.getText().length()==0) {
             return "Must specify delay start (or 0 for no delay)";
+        }
+        if (customCaptureFrameRateSwitch.isEnabled() && Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()) > Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString())) {
+            return "Capture frame rate must be lower or equal to video frame rate";
         }
         return null;
     }
