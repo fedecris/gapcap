@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.SurfaceHolder;
@@ -14,14 +17,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback {
@@ -31,8 +32,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Surface para la reproduccion de video
     public static SurfaceView mSurfaceView;
     public static SurfaceHolder mSurfaceHolder;
-    // Intent instance
-    public static Intent intent;
+    // Message para interactuar
+    Messenger messenger = new Messenger(new ResponseHandler());
 
     // Start button
     public Button startButton;
@@ -159,8 +160,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         updateComponentsStatus(true);
 
         // Iniciar el intent con el servicio de grabacion
-        intent = new Intent  (this, RecorderService.class);
+        Intent intent = new Intent  (this, RecorderService.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(Constants.MESSENGER, messenger);
         intent.putExtra(Constants.PREFERENCE_DELAY_START, Integer.parseInt(delayStartSecsEditText.getText().toString()));
         intent.putExtra(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
         intent.putExtra(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
@@ -187,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     public void detener(View v) {
         updateComponentsStatus(false);
-        stopService(intent);
+        stopService(new Intent(MainActivity.this, RecorderService.class));
     }
 
     /** Activa o desactiva los botones segun el estado de grabacion */
@@ -347,5 +349,21 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         //Toast.makeText(getBaseContext(), "SURFACE DESTROYED", Toast.LENGTH_SHORT).show();
+    }
+
+    // Manejador de notificaciones por parte del servicio.
+    class ResponseHandler extends Handler {
+        @Override public void handleMessage(Message message) {
+            if (message.what==Constants.NOTIFY_ERROR) {
+                updateComponentsStatus(false);
+                Toast.makeText(getBaseContext(), message.obj.toString(), Toast.LENGTH_SHORT).show();
+            } else if (message.what==Constants.NOTIFY_START) {
+                updateComponentsStatus(true);
+                Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
+            } else if (message.what==Constants.NOTIFY_STOP) {
+                updateComponentsStatus(false);
+                Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

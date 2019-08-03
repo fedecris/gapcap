@@ -2,6 +2,16 @@ package ar.com.federicocristina.gapcap;
 
 class Constants {
 
+    // Key para intercambio del messenger
+    static final String MESSENGER                                  = "Messenger";
+
+    // Notificacion de Error
+    static final int NOTIFY_ERROR                                   = -1;
+    // Notificacion de inicio de servicio
+    static final int NOTIFY_START                                   = 1;
+    // Notificacion de detencion de servicio
+    static final int NOTIFY_STOP                                    = 0;
+
     // Nombre de la camara frontal
     static final String FRONT_CAM_NAME                             = "Front";
     // Nombre de la camara trasera

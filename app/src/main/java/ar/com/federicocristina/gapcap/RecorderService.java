@@ -8,7 +8,9 @@ import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.widget.Toast;
 
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
@@ -27,6 +29,8 @@ public class RecorderService extends Service {
     public static boolean mRecordingStatus = false;
     // ID de referencia
     private int id = 6789;
+    // Messenger para interaccion con Activity
+    Messenger messenger;
 
     // Delay?
     int delayStartSecs = 0;
@@ -86,6 +90,7 @@ public class RecorderService extends Service {
             if (extras == null) {
                 throw new Exception("Failed to start service");
             } else {
+                messenger =  (Messenger)extras.get(Constants.MESSENGER);
                 delayStartSecs = (Integer)extras.get(Constants.PREFERENCE_DELAY_START);
                 frontalCamera = (Boolean)extras.get(Constants.PREFERENCE_FRONT_CAMERA);
                 recordAudio = (Boolean)extras.get(Constants.PREFERENCE_RECORD_AUDIO);
@@ -105,9 +110,9 @@ public class RecorderService extends Service {
             if (mRecordingStatus == false)
                 mRecordingStatus = startRecording();
         } catch (RuntimeException e) {
-            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
         } catch (Exception e2) {
-            Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
+            notifyEvent(Constants.NOTIFY_ERROR, e2.getMessage());
         }
 
         return START_STICKY;
@@ -140,8 +145,7 @@ public class RecorderService extends Service {
                                                  public void onInfo(MediaRecorder mr, int what, int extra) {
                                                      // Se llego al tiempo o tamaño
                                                      if (what == MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED || what == MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
-                                                         // TODO: NOTIFICAR
-                                                         stopService(MainActivity.intent);
+                                                         stopRecording(false);
                                                      }
                                                  }
                                              });
@@ -192,20 +196,19 @@ public class RecorderService extends Service {
             mMediaRecorder.start();
 
             mRecordingStatus = true;
-//            MainActivity.updateComponentsStatus(mRecordingStatus);
+            notifyEvent(Constants.NOTIFY_START, null);
 
-            // Notificar sobre el inicio del servicio
-            Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
+            // Inicio del servicio
             Notification note=new Notification();
             startForeground(id, note);
 
             return true;
         } catch (RuntimeException e2) {
-            Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
+            notifyEvent(Constants.NOTIFY_ERROR, e2.getMessage());
             stopRecording(true);
             return false;
          } catch (Exception e) {
-            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
             stopRecording(true);
             return false;
         }
@@ -218,7 +221,7 @@ public class RecorderService extends Service {
                 mMediaRecorder.reset();
                 mMediaRecorder.release();
             } catch (Exception e) {
-                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
             }
 
             try {
@@ -226,21 +229,21 @@ public class RecorderService extends Service {
                 mServiceCamera.release();
                 mServiceCamera = null;
             } catch (Exception e) {
-                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
             }
 
             stopForeground(true);
             mRecordingStatus = false;
-//            MainActivity.updateComponentsStatus(mRecordingStatus);
+            notifyEvent(Constants.NOTIFY_STOP, null);
 
 
         } catch (RuntimeException e2) {
-            Toast.makeText(getBaseContext(), e2.getMessage(), Toast.LENGTH_LONG).show();
+            notifyEvent(Constants.NOTIFY_ERROR, e2.getMessage());
         } catch (Exception e) {
-            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
         } finally {
             if (!withError) {
-                Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
+                notifyEvent(Constants.NOTIFY_STOP, null);
             } else {
                 stopSelf();
             }
@@ -266,6 +269,19 @@ public class RecorderService extends Service {
                 return Camera.Parameters.FOCUS_MODE_FIXED;
             default:
                 return Camera.Parameters.FOCUS_MODE_FIXED;
+        }
+    }
+
+
+    /** Notificar una actividad en particular */
+    protected void notifyEvent(int what, String content) {
+        Message message = Message.obtain(null, what, content);
+        message.replyTo = messenger;
+        try {
+            messenger.send(message);
+        }
+        catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
