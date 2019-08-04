@@ -1,5 +1,7 @@
 package ar.com.federicocristina.gapcap;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -9,9 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,16 +30,17 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     // TAG Logcat
     private static final String TAG = "Recorder";
-    // Surface para la reproduccion de video
-    public static SurfaceView mSurfaceView;
-    public static SurfaceHolder mSurfaceHolder;
+    // Last scheduled service
+    protected static long lastScheduled = 0;
+    // Schedule
+    static PendingIntent pendingIntent;
     // Message para interactuar
     Messenger messenger = new Messenger(new ResponseHandler());
 
     // Start button
-    public Button startButton;
+    public static Button startButton;
     // Stop button
-    public Button stopButton;
+    public static Button stopButton;
     // Path de grabacion
     public EditText filePathEditText;
     // Path de grabacion
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     // Capture Frame Rate
     public Spinner captureFrameRateSpinner;
     // Estado de grabacion
-    public TextView status;
+    public static TextView status;
     // Ejecutar en background?
     public Switch runInBackgroundSwitch;
     // Limitar tamaño
@@ -76,19 +77,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public Spinner focusModeSpinner;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onResume() {
+        super.onResume();
         setContentView(R.layout.activity_main);
 
         // Habilitar icono en ActionBar
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.mipmap.ic_launcher);
-
-        // Iniciarlizar superficie
-        mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView1);
-        mSurfaceHolder = mSurfaceView.getHolder();
-        mSurfaceHolder.addCallback(this);
-        mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         // Recuperar componentes generales
         startButton = findViewById(R.id.button_startService);
@@ -144,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         // Status actual de componentes
         loadSharedPreferences();
-        updateComponentsStatus(RecorderService.mRecordingStatus);
+        updateComponentsStatus();
 
 
     }
@@ -157,47 +152,81 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             return;
         }
 
-        updateComponentsStatus(true);
-
         // Iniciar el intent con el servicio de grabacion
-        Intent intent = new Intent  (this, RecorderService.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(Constants.MESSENGER, messenger);
-        intent.putExtra(Constants.PREFERENCE_DELAY_START, Integer.parseInt(delayStartSecsEditText.getText().toString()));
-        intent.putExtra(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
-        intent.putExtra(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
-        intent.putExtra(Constants.PREFERENCE_QUALIY, qualitySeekBar.getProgress());
-        intent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, customVideoFrameRateSwitch.isChecked());
-        intent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE, Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString()));
-        intent.putExtra(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked());
-        intent.putExtra(Constants.PREFERENCE_CAPTURE_FRAME_RATE, Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()));
-        intent.putExtra(Constants.PREFERENCE_LIMIT_SIZE, Integer.parseInt(limitSizeMBEditText.getText().toString()));
-        intent.putExtra(Constants.PREFERENCE_LIMIT_TIME, Integer.parseInt(limitTimeSecsEditText.getText().toString()));
-        intent.putExtra(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItem().toString());
-        intent.putExtra(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItem().toString());
-        intent.putExtra(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
-        intent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
-        intent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
-        ComponentName ret = startService(intent);
-        ret.getClassName();
+        Intent alarmIntent = new Intent(this, RecorderService.class);
+        alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        alarmIntent.putExtra(Constants.MESSENGER, messenger);
+        alarmIntent.putExtra(Constants.PREFERENCE_DELAY_START, Integer.parseInt(delayStartSecsEditText.getText().toString()));
+        alarmIntent.putExtra(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_QUALIY, qualitySeekBar.getProgress());
+        alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, customVideoFrameRateSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE, Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString()));
+        alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_CAPTURE_FRAME_RATE, Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()));
+        alarmIntent.putExtra(Constants.PREFERENCE_LIMIT_SIZE, Integer.parseInt(limitSizeMBEditText.getText().toString()));
+        alarmIntent.putExtra(Constants.PREFERENCE_LIMIT_TIME, Integer.parseInt(limitTimeSecsEditText.getText().toString()));
+        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItem().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItem().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
 
+        // Programar el inicio del servicio de grabacion, o bien iniciar inmediatamente
+        if (Integer.parseInt(delayStartSecsEditText.getText().toString()) > 0) {
+            lastScheduled = System.currentTimeMillis() + Integer.parseInt(delayStartSecsEditText.getText().toString()) * 1000;
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            pendingIntent = PendingIntent.getService(this, 1, alarmIntent, 0);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, lastScheduled, pendingIntent);
+            updateComponentsStatus();
+        } else {
+            lastScheduled = 0;
+            ComponentName ret = startService(alarmIntent);
+            ret.getClassName();
+            updateComponentsStatus(true);
+        }
         // Finalizar la actividad si corresponde
         if (runInBackgroundSwitch.isChecked()) {
             finish();
         }
     }
 
+
     public void detener(View v) {
+        long current = System.currentTimeMillis();
+        if (current < lastScheduled) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+            lastScheduled = 0;
+        } else {
+            stopService(new Intent(MainActivity.this, RecorderService.class));
+        }
         updateComponentsStatus(false);
-        stopService(new Intent(MainActivity.this, RecorderService.class));
+    }
+
+    /** Sobrecarga */
+    public void updateComponentsStatus() {
+        updateComponentsStatus(null);
     }
 
     /** Activa o desactiva los botones segun el estado de grabacion */
-    public void updateComponentsStatus(boolean recording) {
+    public void updateComponentsStatus(Boolean forceRecording) {
+        // Estado componentes sin importar el modo de grabacion
         customVideoFrameRateSwitch.setEnabled(false); // Se habilita o no dependiendo del timelapse mode
-        (startButton).setEnabled(!recording);
-        (stopButton).setEnabled(recording);
-        status.setText(recording ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
+
+        // Existe una operacion de schedule?
+        long current = System.currentTimeMillis();
+        if (current < lastScheduled) {
+            status.setText("Scheduled: " + Utils.getDateTimeFor("yyyy-MM-dd HH:mm:ss", lastScheduled));
+            startButton.setEnabled(false);
+            stopButton.setText("CANCEL");
+            stopButton.setEnabled(true);
+        } else {
+            status.setText((forceRecording != null && forceRecording) || RecorderService.mRecordingStatus ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
+            stopButton.setText("STOP");
+            startButton.setEnabled(forceRecording !=null ? !forceRecording : !RecorderService.mRecordingStatus);
+            stopButton.setEnabled(forceRecording != null? forceRecording : RecorderService.mRecordingStatus);
+        }
         customCaptureFrameRateChanged();
         customVideoFrameRateChanged();
     }
@@ -361,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             content.append("Error: ");
             content.append(message.obj != null ? message.obj.toString(): "unknown error.");
             if (message.what==Constants.NOTIFY_ERROR) {
-                updateComponentsStatus(false);
+                updateComponentsStatus();
                 Toast.makeText(getBaseContext(), content.toString(), Toast.LENGTH_SHORT).show();
             } else if (message.what==Constants.NOTIFY_START) {
                 updateComponentsStatus(true);

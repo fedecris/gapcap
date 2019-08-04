@@ -1,8 +1,12 @@
 package ar.com.federicocristina.gapcap;
 
+import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -20,12 +24,14 @@ public class RecorderService extends Service {
 
     // Tag Logcat
     private static final String TAG = "RecorderService";
-    // Servicio de camara
-    private static Camera mServiceCamera;
-    // Grabacion de medios
-    private MediaRecorder mMediaRecorder;
     // Estado de grabacion
     public static boolean mRecordingStatus = false;
+    // Servicio de camara
+    private Camera mServiceCamera;
+    // Grabacion de medios
+    private MediaRecorder mMediaRecorder;
+    // Surface texture for preview
+    protected SurfaceTexture surfaceTexture;
     // ID de referencia
     private int id = 6789;
     // Messenger para interaccion con Activity
@@ -61,13 +67,6 @@ public class RecorderService extends Service {
     String fileDateFormat;
 
     @Override
-    public void onCreate() {
-
-
-    }
-
-
-    @Override
     public IBinder onBind(Intent intent) {
         // TODO Auto-generated method stub
         return null;
@@ -83,8 +82,6 @@ public class RecorderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStart(intent, startId);
         try {
-            super.onCreate();
-
             Bundle extras = intent.getExtras();
             if (extras == null) {
                 throw new Exception("Failed to start service");
@@ -119,11 +116,6 @@ public class RecorderService extends Service {
 
     public boolean startRecording(){
         try {
-            // Demorar el inicio?
-            if (delayStartSecs > 0) {
-                Thread.sleep(delayStartSecs * 1000);
-            }
-
             // Si se selecciono utilizar la camara frontal
             if (frontalCamera)
                 mServiceCamera = Camera.open(android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
@@ -135,7 +127,8 @@ public class RecorderService extends Service {
             parameters.setFocusMode(getSelectedFocusMode());
             mServiceCamera.setParameters(parameters);
 
-            mServiceCamera.setPreviewDisplay(MainActivity.mSurfaceHolder);
+            surfaceTexture = new SurfaceTexture(0);
+            mServiceCamera.setPreviewTexture(surfaceTexture);
             mServiceCamera.unlock();
 
             mMediaRecorder = new MediaRecorder();
@@ -185,7 +178,6 @@ public class RecorderService extends Service {
             mMediaRecorder.setMaxDuration(limitTimeSecs*1000);
 
             // ORIENTACION DEL DISPOSITIVO
-            mMediaRecorder.setPreviewDisplay(MainActivity.mSurfaceHolder.getSurface());
             mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext()));
 
             // OUTPUT FILE
@@ -269,7 +261,9 @@ public class RecorderService extends Service {
         Message message = Message.obtain(null, what, content);
         message.replyTo = messenger;
         try {
-            messenger.send(message);
+            if (messenger!=null) {
+                messenger.send(message);
+            }
         }
         catch (RemoteException e) {
             e.printStackTrace();

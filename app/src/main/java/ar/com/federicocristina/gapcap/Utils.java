@@ -33,6 +33,11 @@ public class Utils {
         return new SimpleDateFormat(format).format(Calendar.getInstance().getTime());
     }
 
+    /** Retorna la fecha y hora actual para un timestamp en particular */
+    public static String getDateTimeFor(String format, long time) {
+        return new SimpleDateFormat(format).format(time);
+    }
+
     /** Ubicacions de la grabacion */
     public static String getRecordingFileName(String filePath, String filePrefix, String dateFormat) {
         String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + filePath + File.separator +  filePrefix + Utils.getDateTime(dateFormat) + ".mp4";
