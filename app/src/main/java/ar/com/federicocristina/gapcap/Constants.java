@@ -62,6 +62,9 @@ class Constants {
     static final String PREFERENCE_DELAY_START                     = "DELAY_START";
     // Shared preference: focus mode
     static final String PREFERENCE_FOCUS_MODE                      = "FOCUS_MODE";
+    // Shared preference: repeat at limit
+    static final String PREFERENCE_REPEAT_AT_LIMIT                 = "REPEAT_AT_LIMIT";
+
 
 
 }

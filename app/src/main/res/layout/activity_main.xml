@@ -275,6 +275,12 @@
                     android:text="Seconds" />
             </LinearLayout>
 
+            <Switch
+                android:id="@+id/switch_repeatAtLimit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Repeat after limit" />
+
             <TextView
                 android:id="@+id/PathView"
                 android:layout_width="match_parent"

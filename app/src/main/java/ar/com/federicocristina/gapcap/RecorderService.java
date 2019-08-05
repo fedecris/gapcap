@@ -65,6 +65,8 @@ public class RecorderService extends Service {
     String filePrefix;
     // File date format
     String fileDateFormat;
+    // Repeat at limit
+    boolean repeatAtLimit;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -102,6 +104,7 @@ public class RecorderService extends Service {
                 filePath =  (String)extras.get(Constants.PREFERENCE_FILEPATH);
                 filePrefix =  (String)extras.get(Constants.PREFERENCE_FILEPREFIX);
                 fileDateFormat =  (String)extras.get(Constants.PREFERENCE_FILETIMESTAMP);
+                repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT);
             }
             if (mRecordingStatus == false)
                 mRecordingStatus = startRecording();
@@ -137,7 +140,7 @@ public class RecorderService extends Service {
                                                  public void onInfo(MediaRecorder mr, int what, int extra) {
                                                      // Se llego al tiempo o tamaño
                                                      if (what == MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED || what == MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
-                                                         stopRecording(false);
+                                                         stopRecording(false, repeatAtLimit);
                                                      }
                                                  }
                                              });
@@ -205,7 +208,11 @@ public class RecorderService extends Service {
         }
     }
 
-    public void stopRecording(boolean withError ) {
+    public void stopRecording(boolean withError) {
+        stopRecording(withError, false);
+    }
+
+    public void stopRecording(boolean withError , boolean respawn) {
         try {
             try {
                 mMediaRecorder.stop();
@@ -221,6 +228,12 @@ public class RecorderService extends Service {
                 mServiceCamera = null;
             } catch (Exception e) {
                 notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
+            }
+
+            // Si debe repetir, reiniciar nuevamente
+            if (!withError && respawn) {
+                startRecording();
+                return;
             }
 
             stopForeground(true);

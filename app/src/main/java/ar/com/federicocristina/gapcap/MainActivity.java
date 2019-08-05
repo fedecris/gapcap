@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public EditText delayStartSecsEditText;
     // Focus
     public Spinner focusModeSpinner;
+    // Repetir una vez llegado el limite?
+    public Switch repeatAtLimitSwitch;
 
     @Override
     protected void onResume() {
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         limitTimeSecsEditText = findViewById(R.id.limitTimeEditText);
         delayStartSecsEditText = findViewById(R.id.editText_delayStart);
         focusModeSpinner = findViewById(R.id.spinner_focus);
+        repeatAtLimitSwitch = findViewById(R.id.switch_repeatAtLimit);
 
         // Recuperar la configuracion de las camaras y cargar los componentes visuales
         Utils.retrieveCameraFeatures();
@@ -171,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         alarmIntent.putExtra(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
 
         // Programar el inicio del servicio de grabacion, o bien iniciar inmediatamente
         if (Integer.parseInt(delayStartSecsEditText.getText().toString()) > 0) {
@@ -316,6 +320,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         limitTimeSecsEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_TIME, "0"));
         delayStartSecsEditText.setText(preferences.getString(Constants.PREFERENCE_DELAY_START, "0"));
         focusModeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FOCUS_MODE, 0));
+        repeatAtLimitSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, false));
     }
 
     /** Almacenamiento de configuración */
@@ -338,6 +343,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putString(Constants.PREFERENCE_LIMIT_TIME, limitTimeSecsEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_DELAY_START, delayStartSecsEditText.getText().toString());
         editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItemPosition());
+        editor.putBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
         editor.commit();
     }
 
