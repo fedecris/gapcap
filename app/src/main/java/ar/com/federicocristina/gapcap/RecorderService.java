@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.media.AudioManager;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -67,6 +68,8 @@ public class RecorderService extends Service {
     String fileDateFormat;
     // Repeat at limit
     boolean repeatAtLimit;
+    // Stealth
+    boolean stealthMode;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -105,6 +108,7 @@ public class RecorderService extends Service {
                 filePrefix =  (String)extras.get(Constants.PREFERENCE_FILEPREFIX);
                 fileDateFormat =  (String)extras.get(Constants.PREFERENCE_FILETIMESTAMP);
                 repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT);
+                stealthMode = (Boolean)extras.get(Constants.PREFERENCE_STEALTH_MODE);
             }
             if (mRecordingStatus == false)
                 mRecordingStatus = startRecording();
@@ -186,6 +190,10 @@ public class RecorderService extends Service {
             // OUTPUT FILE
             mMediaRecorder.setOutputFile(Utils.getRecordingFileName(filePath, filePrefix, fileDateFormat));
 
+            // START RECORDING
+            if (stealthMode) {
+                Utils.muteNotificationSounds(getBaseContext(), true);
+            }
             mMediaRecorder.prepare();
             mMediaRecorder.start();
 
@@ -215,6 +223,9 @@ public class RecorderService extends Service {
     public void stopRecording(boolean withError , boolean respawn) {
         try {
             try {
+                if (stealthMode) {
+                    Utils.muteNotificationSounds(getBaseContext(), true);
+                }
                 mMediaRecorder.stop();
                 mMediaRecorder.reset();
                 mMediaRecorder.release();

@@ -2,6 +2,8 @@ package ar.com.federicocristina.gapcap;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.media.AudioManager;
+import android.os.Build;
 import android.os.Environment;
 import android.view.Surface;
 import android.view.WindowManager;
@@ -137,6 +139,25 @@ public class Utils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    static int prevRingerMode;
+    /** Habilitar o deshabilitar sonidos */
+    public static void muteNotificationSounds(Context context, boolean mute) {
+        // Recuperar el audio manager
+        AudioManager audioManager = ((AudioManager)context.getSystemService(Context.AUDIO_SERVICE));
+
+        // Si vamos a mutear, primero guardar el estado anterior
+        if (mute) {
+            prevRingerMode = audioManager.getRingerMode();
+        }
+        // Al mutear/desmutear, primero verificar si el estado anterior era mute (entonces no hacer nada)
+        if (prevRingerMode == AudioManager.RINGER_MODE_SILENT)
+            return;
+
+        // Mutear o bien volver al modo original?
+        int mode = (mute ? AudioManager.RINGER_MODE_SILENT : prevRingerMode);
+        audioManager.setRingerMode(mode);
     }
 
 

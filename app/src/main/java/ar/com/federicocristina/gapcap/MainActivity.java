@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public Spinner focusModeSpinner;
     // Repetir una vez llegado el limite?
     public Switch repeatAtLimitSwitch;
+    // Stealth mode
+    public Switch stealthModeSwitch;
 
     @Override
     protected void onResume() {
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         delayStartSecsEditText = findViewById(R.id.editText_delayStart);
         focusModeSpinner = findViewById(R.id.spinner_focus);
         repeatAtLimitSwitch = findViewById(R.id.switch_repeatAtLimit);
+        stealthModeSwitch = findViewById(R.id.switch_stealthMode);
 
         // Recuperar la configuracion de las camaras y cargar los componentes visuales
         Utils.retrieveCameraFeatures();
@@ -143,8 +146,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         // Status actual de componentes
         loadSharedPreferences();
         updateComponentsStatus();
-
-
     }
 
     public void iniciar(View v) {
@@ -175,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         alarmIntent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
 
         // Programar el inicio del servicio de grabacion, o bien iniciar inmediatamente
         if (Integer.parseInt(delayStartSecsEditText.getText().toString()) > 0) {
@@ -189,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             ret.getClassName();
             updateComponentsStatus(true);
         }
+
         // Finalizar la actividad si corresponde
         if (runInBackgroundSwitch.isChecked()) {
             finish();
@@ -321,6 +324,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         delayStartSecsEditText.setText(preferences.getString(Constants.PREFERENCE_DELAY_START, "0"));
         focusModeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FOCUS_MODE, 0));
         repeatAtLimitSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, false));
+        stealthModeSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_STEALTH_MODE, false));
+
+
     }
 
     /** Almacenamiento de configuración */
@@ -345,6 +351,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItemPosition());
         editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItemPosition());
         editor.putBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
+        editor.putBoolean(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
         editor.commit();
     }
 
@@ -398,13 +405,19 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             content.append(message.obj != null ? message.obj.toString(): "unknown error.");
             if (message.what==Constants.NOTIFY_ERROR) {
                 updateComponentsStatus();
-                Toast.makeText(getBaseContext(), content.toString(), Toast.LENGTH_SHORT).show();
+                if (!stealthModeSwitch.isChecked()) {
+                    Toast.makeText(getBaseContext(), content.toString(), Toast.LENGTH_SHORT).show();
+                }
             } else if (message.what==Constants.NOTIFY_START) {
                 updateComponentsStatus(true);
-                Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
+                if (!stealthModeSwitch.isChecked()) {
+                    Toast.makeText(getBaseContext(), R.string.ServiceStarted, Toast.LENGTH_SHORT).show();
+                }
             } else if (message.what==Constants.NOTIFY_STOP) {
                 updateComponentsStatus(false);
-                Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
+                if (!stealthModeSwitch.isChecked()) {
+                    Toast.makeText(getBaseContext(), R.string.ServiceStopped, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

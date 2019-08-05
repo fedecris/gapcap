@@ -64,6 +64,8 @@ class Constants {
     static final String PREFERENCE_FOCUS_MODE                      = "FOCUS_MODE";
     // Shared preference: repeat at limit
     static final String PREFERENCE_REPEAT_AT_LIMIT                 = "REPEAT_AT_LIMIT";
+    // Force No notifications or sound
+    static final String PREFERENCE_STEALTH_MODE                    = "STEALTH_MODE";
 
 
 

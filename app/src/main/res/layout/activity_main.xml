@@ -75,6 +75,20 @@
                 android:text="Run in background" />
 
             <View
+                android:id="@+id/divider15"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
+
+            <Switch
+                android:id="@+id/switch_stealthMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Stealth mode" />
+
+            <View
                 android:id="@+id/divider4"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
