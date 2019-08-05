@@ -74,16 +74,13 @@
                 android:height="40dp"
                 android:text="Run in background" />
 
-            <FrameLayout
-                android:id="@+id/frameLayout_preview"
+            <View
+                android:id="@+id/divider4"
                 android:layout_width="match_parent"
-                android:layout_height="1dp">
-
-                <SurfaceView
-                    android:id="@+id/surfaceView1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </FrameLayout>
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
 
             <Switch
                 android:id="@+id/switch_frontalCamera"
@@ -91,11 +88,27 @@
                 android:layout_height="wrap_content"
                 android:text="Front camera" />
 
+            <View
+                android:id="@+id/divider6"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
+
             <Switch
                 android:id="@+id/switch_audio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Record audio" />
+
+            <View
+                android:id="@+id/divider7"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -119,6 +132,14 @@
                     android:progress="3" />
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider9"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
+
             <TextView
                 android:id="@+id/Focus_TextView"
                 android:layout_width="match_parent"
@@ -130,6 +151,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <View
+                android:id="@+id/divider5"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
+
             <TextView
                 android:id="@+id/videoSizetextView"
                 android:layout_width="match_parent"
@@ -140,6 +169,13 @@
                 android:id="@+id/spinner_videoSize"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <View
+                android:id="@+id/divider8"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/captureFrameRateTextView"
@@ -168,6 +204,14 @@
 
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
+
             <TextView
                 android:id="@+id/videoFrameRateTextView"
                 android:layout_width="match_parent"
@@ -194,6 +238,14 @@
                     android:layout_weight="1" />
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
+
             <TextView
                 android:id="@+id/delayStartTextView"
                 android:layout_width="match_parent"
@@ -210,6 +262,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="@android:color/transparent"
                     android:ems="10"
                     android:inputType="number" />
 
@@ -220,6 +273,14 @@
                     android:layout_weight="1"
                     android:text="Seconds" />
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider10"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/lmitSize_textView"
@@ -237,6 +298,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="@android:color/transparent"
                     android:ems="10"
                     android:inputType="number" />
 
@@ -247,6 +309,14 @@
                     android:layout_weight="1"
                     android:text="Megabytes" />
             </LinearLayout>
+
+            <View
+                android:id="@+id/divider11"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/limitTime_textView"
@@ -264,6 +334,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="@android:color/transparent"
                     android:ems="10"
                     android:inputType="number" />
 
@@ -275,17 +346,33 @@
                     android:text="Seconds" />
             </LinearLayout>
 
+            <View
+                android:id="@+id/divider12"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
+
             <Switch
                 android:id="@+id/switch_repeatAtLimit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Repeat after limit" />
 
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
+
             <TextView
                 android:id="@+id/PathView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Path" />
+                android:text="Filename path" />
 
             <EditText
                 android:id="@+id/editText_path"
@@ -293,9 +380,18 @@
                 android:layout_height="wrap_content"
                 android:height="50dp"
                 android:autofillHints=""
+                android:background="@android:color/transparent"
                 android:ems="10"
                 android:inputType="textPersonName"
                 tools:targetApi="o" />
+
+            <View
+                android:id="@+id/divider13"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/FilePrefixView"
@@ -307,8 +403,17 @@
                 android:id="@+id/editText_filePrefix"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
                 android:ems="10"
                 android:inputType="textPersonName" />
+
+            <View
+                android:id="@+id/divider14"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/FilenameTimeStamptextView"
@@ -320,6 +425,7 @@
                 android:id="@+id/editText_filenameTimestamp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
                 android:ems="10"
                 android:inputType="textPersonName" />
 
