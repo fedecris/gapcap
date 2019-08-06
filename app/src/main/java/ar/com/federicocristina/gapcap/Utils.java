@@ -1,9 +1,9 @@
 package ar.com.federicocristina.gapcap;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Environment;
 import android.view.Surface;
 import android.view.WindowManager;
@@ -27,7 +27,11 @@ public class Utils {
     // Tamaños de grabacion
     public static HashMap<Integer, List<Integer>> videoFrameRates = new HashMap<Integer, List<Integer>>();
     // Soporte Autofocus
-    public static HashMap<Integer, Boolean> autofocusModes = new HashMap<Integer, Boolean>();
+    public static HashMap<Integer, Boolean> autoFocusSupport = new HashMap<Integer, Boolean>();
+    // Soporte Flash
+    public static HashMap<Integer, Boolean> flashSupport = new HashMap<Integer, Boolean>();
+    //  Previous ringer mode
+    static int prevRingerMode = -1;
 
 
     /** Retorna la fecha y hora actual */
@@ -94,7 +98,7 @@ public class Utils {
     }
 
     /** Guarda las caracteristicas de cada camara en las estructuras correspondientes (por cada camara) */
-    public static void retrieveCameraFeatures() {
+    public static void retrieveCameraFeatures(Context context) {
         // Retrieve only once
         if (featuresRetrieved)
             return;
@@ -111,7 +115,9 @@ public class Utils {
             // Autofocus modes
             List<String> supportedFocusModes = cam.getParameters().getSupportedFocusModes();
             boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
-            autofocusModes.put(Camera.CameraInfo.CAMERA_FACING_BACK, hasAutoFocus);
+            autoFocusSupport.put(Camera.CameraInfo.CAMERA_FACING_BACK, hasAutoFocus);
+            // Flash
+            flashSupport.put(Camera.CameraInfo.CAMERA_FACING_BACK, context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH));
             cam.release();
         }
 
@@ -126,7 +132,9 @@ public class Utils {
             // Autofocus modes
             List<String> supportedFocusModes = cam.getParameters().getSupportedFocusModes();
             boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
-            autofocusModes.put(Camera.CameraInfo.CAMERA_FACING_FRONT, hasAutoFocus);
+            autoFocusSupport.put(Camera.CameraInfo.CAMERA_FACING_FRONT, hasAutoFocus);
+            // Flash
+            flashSupport.put(Camera.CameraInfo.CAMERA_FACING_FRONT, context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH));
             cam.release();
         }
     }
@@ -141,7 +149,7 @@ public class Utils {
         }
     }
 
-    static int prevRingerMode;
+
     /** Habilitar o deshabilitar sonidos */
     public static void muteNotificationSounds(Context context, boolean mute) {
         // Recuperar el audio manager
@@ -151,6 +159,7 @@ public class Utils {
         if (mute) {
             prevRingerMode = audioManager.getRingerMode();
         }
+
         // Al mutear/desmutear, primero verificar si el estado anterior era mute (entonces no hacer nada)
         if (prevRingerMode == AudioManager.RINGER_MODE_SILENT)
             return;
@@ -158,6 +167,11 @@ public class Utils {
         // Mutear o bien volver al modo original?
         int mode = (mute ? AudioManager.RINGER_MODE_SILENT : prevRingerMode);
         audioManager.setRingerMode(mode);
+
+        // Reiniciar el prevRingerMode
+        if (!mute) {
+            prevRingerMode = 1;
+        }
     }
 
 

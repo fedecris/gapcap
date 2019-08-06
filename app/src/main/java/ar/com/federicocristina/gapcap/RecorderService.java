@@ -70,6 +70,8 @@ public class RecorderService extends Service {
     boolean repeatAtLimit;
     // Stealth
     boolean stealthMode;
+    // Flash?
+    boolean useFlash;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -109,6 +111,7 @@ public class RecorderService extends Service {
                 fileDateFormat =  (String)extras.get(Constants.PREFERENCE_FILETIMESTAMP);
                 repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT);
                 stealthMode = (Boolean)extras.get(Constants.PREFERENCE_STEALTH_MODE);
+                useFlash = (Boolean)extras.get(Constants.PREFERENCE_USE_FLASH);
             }
             if (mRecordingStatus == false)
                 mRecordingStatus = startRecording();
@@ -129,9 +132,11 @@ public class RecorderService extends Service {
             else
                 mServiceCamera = Camera.open();
 
-            mServiceCamera.getParameters().getSupportedFocusModes();
             Camera.Parameters parameters = mServiceCamera.getParameters();
             parameters.setFocusMode(getSelectedFocusMode());
+            if (useFlash) {
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            }
             mServiceCamera.setParameters(parameters);
 
             surfaceTexture = new SurfaceTexture(0);
@@ -223,9 +228,6 @@ public class RecorderService extends Service {
     public void stopRecording(boolean withError , boolean respawn) {
         try {
             try {
-                if (stealthMode) {
-                    Utils.muteNotificationSounds(getBaseContext(), true);
-                }
                 mMediaRecorder.stop();
                 mMediaRecorder.reset();
                 mMediaRecorder.release();
@@ -250,6 +252,9 @@ public class RecorderService extends Service {
             stopForeground(true);
             mRecordingStatus = false;
             notifyEvent(Constants.NOTIFY_STOP, null);
+            if (stealthMode) {
+                Utils.muteNotificationSounds(getBaseContext(), false);
+            }
         } catch (RuntimeException e2) {
             notifyEvent(Constants.NOTIFY_ERROR, e2.getMessage());
         } catch (Exception e) {
