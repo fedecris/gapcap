@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         alarmIntent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
         alarmIntent.putExtra(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_USE_FLASH, flashSwitch.isEnabled() && flashSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked());
 
         // Programar el inicio del servicio de grabacion, o bien iniciar inmediatamente
         if (Integer.parseInt(delayStartSecsEditText.getText().toString()) > 0) {
@@ -246,7 +246,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
         loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
         loadSupportedFocusModes(frontalCameraSwitch.isChecked());
-        flashSwitch.setEnabled(Utils.flashSupport.get(frontalCameraSwitch.isChecked() ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK));
+        if (!Utils.flashSupport.get(frontalCameraSwitch.isChecked() ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK)) {
+            flashSwitch.setChecked(false);
+            flashSwitch.setEnabled(false);
+        } else {
+            flashSwitch.setEnabled(true);
+        }
+
     }
 
     public void customVideoFrameRateChanged() {
