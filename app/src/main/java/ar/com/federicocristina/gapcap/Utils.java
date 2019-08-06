@@ -117,7 +117,7 @@ public class Utils {
             boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
             autoFocusSupport.put(Camera.CameraInfo.CAMERA_FACING_BACK, hasAutoFocus);
             // Flash
-            flashSupport.put(Camera.CameraInfo.CAMERA_FACING_BACK, context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH));
+            flashSupport.put(Camera.CameraInfo.CAMERA_FACING_BACK, params.getSupportedFlashModes() == null || params.getSupportedFlashModes().size() == 1 ? false : true);
             cam.release();
         }
 
@@ -134,7 +134,7 @@ public class Utils {
             boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
             autoFocusSupport.put(Camera.CameraInfo.CAMERA_FACING_FRONT, hasAutoFocus);
             // Flash
-            flashSupport.put(Camera.CameraInfo.CAMERA_FACING_FRONT, context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH));
+            flashSupport.put(Camera.CameraInfo.CAMERA_FACING_FRONT, params.getSupportedFlashModes() == null || params.getSupportedFlashModes().size() == 1 ? false : true);
             cam.release();
         }
     }
