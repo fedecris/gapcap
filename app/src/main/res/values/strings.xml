@@ -7,4 +7,7 @@
     <string name="DimensionSeparator">x</string>
     <string name="Default">Default</string>
     <string name="Custom">Custom</string>
+    <string name="Start">START</string>
+    <string name="Stop">STOP</string>
+    <string name="Cancel">CANCEL</string>
 </resources>

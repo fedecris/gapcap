@@ -1,15 +1,10 @@
 package ar.com.federicocristina.gapcap;
 
-import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.media.AudioManager;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -72,6 +67,8 @@ public class RecorderService extends Service {
     boolean stealthMode;
     // Flash?
     boolean useFlash;
+    // Server mode?
+    boolean serviceMode;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -89,6 +86,7 @@ public class RecorderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStart(intent, startId);
         try {
+
             Bundle extras = intent.getExtras();
             if (extras == null) {
                 throw new Exception("Failed to start service");
@@ -112,6 +110,7 @@ public class RecorderService extends Service {
                 repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT);
                 stealthMode = (Boolean)extras.get(Constants.PREFERENCE_STEALTH_MODE);
                 useFlash = (Boolean)extras.get(Constants.PREFERENCE_USE_FLASH);
+                serviceMode = (Boolean)extras.get(Constants.PREFERENCE_SERVICE_MODE);
             }
             if (mRecordingStatus == false)
                 mRecordingStatus = startRecording();

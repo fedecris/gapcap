@@ -2,6 +2,14 @@ package ar.com.federicocristina.gapcap;
 
 class Constants {
 
+    // Modo de aplicacion tradicional
+    static final int APP_MODE_NORMAL                               = 0;
+    // Modo de aplicacion server (controlado remotamente)
+    static final int APP_MODE_SERVER                               = 1;
+    // Modo de aplicacion client (controla instancia remota)
+    static final int APP_MODE_CLIENT                               = 2;
+
+
     // Key para intercambio del messenger
     static final String MESSENGER                                  = "Messenger";
     // Notificacion de Error
@@ -68,6 +76,8 @@ class Constants {
     static final String PREFERENCE_STEALTH_MODE                    = "STEALTH_MODE";
     // Shared preference: usar flash?
     static final String PREFERENCE_USE_FLASH                       = "USE_FLASH";
+    // Shared preference: modo server
+    static final String PREFERENCE_SERVICE_MODE                    = "SERVICE_MODE";
 
 
 

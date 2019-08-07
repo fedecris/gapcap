@@ -7,10 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.NetworkOnMainThreadException;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -26,6 +30,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import networkdcq.Host;
+import networkdcq.NetworkDCQ;
+
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback {
 
     // TAG Logcat
@@ -34,8 +41,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     protected static long lastScheduled = 0;
     // Schedule
     static PendingIntent pendingIntent;
-    // Message para interactuar
+    // Message para interactuar con el servicio de grabacion
     Messenger messenger = new Messenger(new ResponseHandler());
+    // Modo de aplicacion: normal, sirviendo, cliente
+    public static int appMode = Constants.APP_MODE_NORMAL;
+    // Consumer de notificaciones
+    static NetworkConsumer networkConsumer;
+    // Host remoto (ya sea el cliente o el servidor segun sea el caso)
+    static Host remoteHost;
 
     // Start button
     public static Button startButton;
@@ -81,6 +94,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     public Switch stealthModeSwitch;
     // Use Flash?
     public Switch flashSwitch;
+    // Service mode? (soporte conexion remota para ejecutar acciones)
+    public Switch serviceModeSwitch;
+    // Boton para coneccion remota y controlar
+    public Button connectToHostButton;
+    // Boton para coneccion remota y controlar
+    public Spinner connectToHostSpinner;
+
 
     @Override
     protected void onResume() {
@@ -114,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         repeatAtLimitSwitch = findViewById(R.id.switch_repeatAtLimit);
         stealthModeSwitch = findViewById(R.id.switch_stealthMode);
         flashSwitch = findViewById(R.id.switch_flash);
+        serviceModeSwitch = findViewById(R.id.switch_serviceMode);
+        connectToHostButton = findViewById(R.id.button_connectToHost);
+        connectToHostSpinner = findViewById(R.id.spinner_connectToHost);
 
         // Recuperar la configuracion de las camaras y cargar los componentes visuales
         Utils.retrieveCameraFeatures(getBaseContext());
@@ -149,9 +172,41 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         // Status actual de componentes
         loadSharedPreferences();
         updateComponentsStatus();
+
     }
 
+    /** Sobrecarga */
+    public void iniciar() {
+        iniciar(null);
+    }
+
+    /** Iniciar la grabacion */
     public void iniciar(View v) {
+
+        // SERVER MODE: Se inicio el modo server?
+        if (appMode == Constants.APP_MODE_NORMAL && serviceModeSwitch.isChecked()) {
+            try {
+                appMode = Constants.APP_MODE_SERVER;
+                startNetwork();
+                startButton.setEnabled(false);
+                stopButton.setEnabled(true);
+                stopButton.setText("CANCEL");
+                status.setText("Waiting for connection...");
+            } catch (Exception e) {
+                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        // CLIENT MODE: Enviar START al host remoto?
+        if (appMode == Constants.APP_MODE_CLIENT) {
+            NetworkData data = new NetworkData(NetworkData.ACTION_START);
+            NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
+            stopButton.setEnabled(true);
+            startButton.setEnabled(false);
+            return;
+        }
+
         // Validar precondiciones
         String retValue = checkPreconditions();
         if (retValue!=null) {
@@ -181,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         alarmIntent.putExtra(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
         alarmIntent.putExtra(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
         alarmIntent.putExtra(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_SERVICE_MODE, serviceModeSwitch.isChecked());
 
         // Programar el inicio del servicio de grabacion, o bien iniciar inmediatamente
         if (Integer.parseInt(delayStartSecsEditText.getText().toString()) > 0) {
@@ -202,8 +258,32 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
     }
 
+    /** Sobrecarga */
+    public void detener() {
+        detener(null);
+    }
 
+    /** Detener la grabacion */
     public void detener(View v) {
+        // SERVER MODE: Cancelarlo? (no hubo conexion)
+        if (appMode == Constants.APP_MODE_SERVER && "CANCEL".equals(stopButton.getText().toString())) {
+            appMode = Constants.APP_MODE_NORMAL;
+            startButton.setEnabled(true);
+            stopButton.setEnabled(false);
+            stopButton.setText("STOP");
+            status.setText(R.string.RecordingStatusReady);
+            return;
+        }
+
+        // CLIENT MODE: Enviar STOP recording al host remoto?
+        if (appMode == Constants.APP_MODE_CLIENT) {
+            NetworkData data = new NetworkData(NetworkData.ACTION_STOP);
+            NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
+            stopButton.setEnabled(false);
+            startButton.setEnabled(true);
+            return;
+        }
+
         long current = System.currentTimeMillis();
         if (current < lastScheduled) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -222,6 +302,19 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     /** Activa o desactiva los botones segun el estado de grabacion */
     public void updateComponentsStatus(Boolean forceRecording) {
+
+        // Modo Cliente?
+        if (appMode == Constants.APP_MODE_CLIENT) {
+            serviceModeSwitch.setEnabled(false);
+            serviceModeSwitch.setChecked(false);
+        }
+
+        // Modo Servidor?
+        if (appMode == Constants.APP_MODE_SERVER) {
+            connectToHostButton.setEnabled(false);
+            connectToHostSpinner.setEnabled(false);
+        }
+
         // Estado componentes sin importar el modo de grabacion
         customVideoFrameRateSwitch.setEnabled(false); // Se habilita o no dependiendo del timelapse mode
 
@@ -315,7 +408,94 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         captureFrameRateSpinner.setAdapter(adapter);
     }
 
+    /** Carga los hosts disponibles para conectarse */
+    public void loadAvailableServers() {
+        ArrayList<String> opciones = new ArrayList<String>();
+        for (String ip : NetworkDCQ.getDiscovery().otherHosts.keySet()) {
+            opciones.add(ip);
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
+        connectToHostSpinner.setAdapter(adapter);
+        if (connectToHostSpinner.getCount()==0)
+            connectToHostButton.setText("SEARCH");
+        else
+            connectToHostButton.setText(remoteHost != null ? "CLOSE" : "CONNECT");
+    }
 
+    public void reloadAvailableServers() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadAvailableServers();
+            }
+        });
+    }
+
+    public void clientConnected() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                status.setText("Connected from: " + remoteHost.getHostIP());
+            }
+        });
+    }
+
+    public void clientDisconnected() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                status.setText("Disconnected");
+            }
+        });
+    }
+
+    public void remoteOK() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                status.setText("Connected OK!");
+            }
+        });
+    }
+
+    public void remoteKO() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                status.setText("Connection Error");
+            }
+        });
+    }
+
+    /** Conectar con un host remoto de la lista */
+    public void connectToRemoteHost(View v) throws Exception {
+        if (appMode == Constants.APP_MODE_NORMAL && "SEARCH".equals(connectToHostButton.getText().toString())) {
+            startNetwork();
+            connectToHostButton.setText("CONNECT");
+        }
+
+        if (appMode == Constants.APP_MODE_NORMAL && "CONNECT".equals(connectToHostButton.getText().toString()) && connectToHostSpinner.getSelectedItem()!=null) {
+            appMode = Constants.APP_MODE_CLIENT;
+            connectToHostButton.setText("CLOSE");
+            remoteHost = NetworkDCQ.getDiscovery().otherHosts.get((String)connectToHostSpinner.getSelectedItem());
+            NetworkDCQ.getCommunication().connectToServerHost(remoteHost);
+            NetworkData data = new NetworkData(NetworkData.ACTION_CONNECT);
+            NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
+            status.setText("Connected to " + remoteHost.getHostIP());
+            updateComponentsStatus(false);
+            return;
+        }
+        if (appMode == Constants.APP_MODE_CLIENT && "CLOSE".equals(connectToHostButton.getText().toString())) {
+            appMode = Constants.APP_MODE_NORMAL;
+            connectToHostButton.setText("SEARCH");
+            NetworkData data = new NetworkData(NetworkData.ACTION_DISCONNECT);
+            NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
+            remoteHost = null;
+            status.setText(R.string.RecordingStatusReady);
+            updateComponentsStatus(false);
+            return;
+        }
+    }
 
     /** Carga de configuración */
     protected void loadSharedPreferences() {
@@ -339,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         repeatAtLimitSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, false));
         stealthModeSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_STEALTH_MODE, false));
         flashSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_USE_FLASH, false));
-
+        serviceModeSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_SERVICE_MODE, false));
 
     }
 
@@ -367,6 +547,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         editor.putBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked());
+        editor.putBoolean(Constants.PREFERENCE_SERVICE_MODE, serviceModeSwitch.isChecked());
         editor.commit();
     }
 
@@ -396,6 +577,19 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         return null;
     }
 
+
+    /** Inicializa los servicios de NetworDCQ*/
+    protected void startNetwork() throws Exception {
+        if (networkConsumer != null)
+            return;
+        networkConsumer = new NetworkConsumer(this);
+
+        if (!NetworkDCQ.configureStartup(networkConsumer, null, null, null))
+            throw new Exception("Network unreachable");
+
+        if (!NetworkDCQ.doStartup(true, true, false))
+            throw new Exception("Error starting network");
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -436,4 +630,5 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             }
         }
     }
+
 }

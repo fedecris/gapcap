@@ -65,7 +65,34 @@
                     android:height="50dp"
                     android:onClick="detener"
                     android:text="STOP" />
+
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button_connectToHost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:onClick="connectToRemoteHost"
+                    android:text="SEARCH" />
+
+                <Spinner
+                    android:id="@+id/spinner_connectToHost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/switch_serviceMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Service mode" />
 
             <Switch
                 android:id="@+id/switch_toBackground"
