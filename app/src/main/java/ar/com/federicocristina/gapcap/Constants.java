@@ -76,8 +76,7 @@ class Constants {
     static final String PREFERENCE_STEALTH_MODE                    = "STEALTH_MODE";
     // Shared preference: usar flash?
     static final String PREFERENCE_USE_FLASH                       = "USE_FLASH";
-    // Shared preference: modo server
-    static final String PREFERENCE_SERVICE_MODE                    = "SERVICE_MODE";
+
 
 
 

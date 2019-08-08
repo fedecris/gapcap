@@ -50,10 +50,10 @@ public class TCPClient extends TCPNetwork {
             }
             connected = true;
         }
-        catch (Exception ex) { 
+        catch (Exception ex) {
         	Logger.e(ex.getMessage());
             connected = false;
-        } 
+        }
         return connected;
     }  
    
@@ -105,4 +105,6 @@ public class TCPClient extends TCPNetwork {
 			//process message
 		}
 	}
+
+
 }

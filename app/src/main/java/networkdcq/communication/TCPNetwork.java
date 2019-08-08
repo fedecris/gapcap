@@ -98,13 +98,18 @@ public class TCPNetwork extends TCPCommunication {
      * Closes the server socket 
      */
     public void closeServer() {
-        try {       
-            socket.close();
-            serverConn.close();
+        try {
+            if (socket!=null)
+                socket.close();
+            if (serverConn!=null)
+                serverConn.close();
         }
         catch (Exception ex) {
             Logger.w(ex.getMessage()); 
-        }      
+        } finally {
+            socket = null;
+            serverConn = null;
+        }
     }
     
 

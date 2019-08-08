@@ -62,7 +62,11 @@ class UDPListener extends UDPDiscovery implements Runnable {
 	    	NetworkDCQ.getCommunication().getConsumer().newHost(host);
 	    }
 	    else {
-	    	// Update host status
+			// Notify status change
+			if ((!otherHosts.get(values[0]).isOnLine() == "Y".equals(values[1])) || (otherHosts.get(values[0]).isOnLine() == "N".equals(values[1])) ) {
+				NetworkDCQ.getCommunication().getConsumer().newHostStatus(new Host(values[0], "Y".equals(values[1])?true:false));
+			}
+			// Update host status
 	    	otherHosts.get(values[0]).updateHostStatus("Y".equals(values[1])?true:false);
 	    }
 	}

@@ -68,31 +68,53 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Server mode" />
+
+            <Button
+                android:id="@+id/button_serverMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="startServerMode"
+                android:text="START SERVER" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Connect to server" />
+
+            <Spinner
+                android:id="@+id/spinner_connectToHost"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/button_searchServers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="searchForRemoteHost"
+                    android:text="SEARCH" />
+
+                <Button
                     android:id="@+id/button_connectToHost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:onClick="connectToRemoteHost"
-                    android:text="SEARCH" />
+                    android:layout_weight="1"
+                    android:onClick="connectToServer"
+                    android:text="CONNECT" />
 
-                <Spinner
-                    android:id="@+id/spinner_connectToHost"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
             </LinearLayout>
-
-            <Switch
-                android:id="@+id/switch_serviceMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Service mode" />
 
             <Switch
                 android:id="@+id/switch_toBackground"

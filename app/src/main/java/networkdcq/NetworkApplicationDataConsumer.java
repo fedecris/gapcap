@@ -18,6 +18,13 @@ public interface NetworkApplicationDataConsumer {
 	 * @param aHost the new host
 	 */
 	public void newHost(Host aHost);
+
+
+	/**
+	 * A pre-existing host has changed its status
+	 * @param aHost the new host
+	 */
+	public void newHostStatus(Host aHost);
 	
 
 	/**

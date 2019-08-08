@@ -57,6 +57,7 @@ public class TCPCommunication extends NetworkCommunication implements Runnable{
 	@Override
 	public boolean stopService() {
 		listenerRunning = false;
+		listener.closeServer();
 		return false;
 	}
 	
@@ -73,7 +74,7 @@ public class TCPCommunication extends NetworkCommunication implements Runnable{
 			clientPool.put(target.getHostIP(), new TCPClient(target.getHostIP()));
 
 		TCPClient client = clientPool.get(target.getHostIP());
-		if (client!=null && !client.connected) {
+		if ((client!=null && !client.connected) || (client.socket !=null && client.socket.isClosed())) {
 			client.connect();
 			HostDiscovery.otherHosts.put(target.getHostIP(), target);
 			return client.connected;

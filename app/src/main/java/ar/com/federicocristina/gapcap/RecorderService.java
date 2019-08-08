@@ -67,8 +67,6 @@ public class RecorderService extends Service {
     boolean stealthMode;
     // Flash?
     boolean useFlash;
-    // Server mode?
-    boolean serviceMode;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -110,7 +108,6 @@ public class RecorderService extends Service {
                 repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT);
                 stealthMode = (Boolean)extras.get(Constants.PREFERENCE_STEALTH_MODE);
                 useFlash = (Boolean)extras.get(Constants.PREFERENCE_USE_FLASH);
-                serviceMode = (Boolean)extras.get(Constants.PREFERENCE_SERVICE_MODE);
             }
             if (mRecordingStatus == false)
                 mRecordingStatus = startRecording();
