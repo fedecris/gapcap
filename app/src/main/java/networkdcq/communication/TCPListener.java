@@ -57,6 +57,8 @@ public class TCPListener extends TCPNetwork implements Runnable {
     public boolean listen() {
         try {   
         	Logger.i("Esperando client connections...");
+        	if (serverConn.isClosed())
+        	    serverConn = new ServerSocket(port);
             socket = serverConn.accept();
             OutputStream output = socket.getOutputStream();
             InputStream input = socket.getInputStream();

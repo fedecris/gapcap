@@ -56,7 +56,21 @@ public class TCPClient extends TCPNetwork {
         }
         return connected;
     }  
-   
+
+    /** Close socket */
+    public void disconnect() {
+    	try {
+			if (socket != null)
+				socket.close();
+			connected = false;
+		} catch (Exception e) {
+
+		} finally {
+    		socket = null;
+		}
+
+	}
+
     /**
      * Prepares and send a message to the otherHosts
      * @param networkGameData message to send

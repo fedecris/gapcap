@@ -6,6 +6,7 @@ import java.net.MulticastSocket;
 
 import networkdcq.Host;
 import networkdcq.NetworkDCQ;
+import networkdcq.util.IterateableConcurrentHashMap;
 import networkdcq.util.Logger;
 
 class UDPDiscovery extends HostDiscovery implements Runnable {
@@ -54,7 +55,10 @@ class UDPDiscovery extends HostDiscovery implements Runnable {
 	 * Stops UDP host discovery.  The thread created in <code>startDiscovery()</code> end normally.
 	 */
 	public void stopDiscovery() {
+
 		running = false;
+		otherHosts.clear();
+
 	}
 
 	/**

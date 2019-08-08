@@ -58,6 +58,7 @@ public class TCPCommunication extends NetworkCommunication implements Runnable{
 	public boolean stopService() {
 		listenerRunning = false;
 		listener.closeServer();
+		closeAllConnections();
 		return false;
 	}
 	
@@ -81,6 +82,16 @@ public class TCPCommunication extends NetworkCommunication implements Runnable{
 		}
 		return client.connected; 
 	}
+
+
+	public void closeAllConnections() {
+		for (String ip : clientPool.keySet()) {
+			TCPClient tpc = clientPool.get(ip);
+			tpc.disconnect();
+		}
+		clientPool.clear();
+	}
+
 	
 	@Override
 	public synchronized void sendMessage(Host targetHost, NetworkApplicationData data) {
