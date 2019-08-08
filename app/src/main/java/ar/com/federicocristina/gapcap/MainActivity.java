@@ -27,6 +27,7 @@ import java.util.List;
 
 import networkdcq.Host;
 import networkdcq.NetworkDCQ;
+import networkdcq.util.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -398,6 +399,7 @@ public class MainActivity extends AppCompatActivity {
     public void loadAvailableServers() {
         ArrayList<String> opciones = new ArrayList<String>();
         for (String ip : NetworkDCQ.getDiscovery().otherHosts.keySet()) {
+            Logger.w(NetworkDCQ.getDiscovery().otherHosts.get(ip).getHostIP() + " -> " + NetworkDCQ.getDiscovery().otherHosts.get(ip).isOnLine());
             if (NetworkDCQ.getDiscovery().otherHosts.get(ip).isOnLine())
             opciones.add(ip);
         }
@@ -641,6 +643,7 @@ public class MainActivity extends AppCompatActivity {
                     serverModeButton.setText("STOP SERVER");
                     status.setText("Waiting for connection...");
                     updateComponentsStatus();
+                    Logger.e("ESTOY ONLINE? " + NetworkDCQ.getDiscovery().thisHost.isOnLine());
                 }
             } catch (Exception e) {
                 Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -652,11 +655,12 @@ public class MainActivity extends AppCompatActivity {
                     if (remoteHost!=null) {
                         NetworkDCQ.getCommunication().sendMessage(remoteHost, new NetworkData(NetworkData.NOTIFY_SERVER_CLOSE));
                     }
+                    NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
                     appMode = Constants.APP_MODE_NORMAL;
                     serverModeButton.setText("START SERVER");
                     status.setText(R.string.RecordingStatusReady);
                     updateComponentsStatus();
-                    NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
+                    Logger.e("ESTOY ONLINE? " + NetworkDCQ.getDiscovery().thisHost.isOnLine());
                     return;
                 }
             } catch (Exception e) {

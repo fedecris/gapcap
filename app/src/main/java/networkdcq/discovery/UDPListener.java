@@ -1,5 +1,7 @@
 package networkdcq.discovery;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -56,18 +58,17 @@ class UDPListener extends UDPDiscovery implements Runnable {
 	    
 	    // Is the host already included in the list?
 	    if (otherHosts.get(values[0])==null) {
-	    	Host host = new Host(values[0], "Y".equals(values[1])?true:false);
+	    	Host host = new Host(values[0], "Y".equals(values[1]));
 	    	otherHosts.put(values[0], host);
 	    	Logger.i("Agregado host:" + host.getHostIP());
 	    	NetworkDCQ.getCommunication().getConsumer().newHost(host);
 	    }
 	    else {
 			// Notify status change
-			if ((!otherHosts.get(values[0]).isOnLine() == "Y".equals(values[1])) || (otherHosts.get(values[0]).isOnLine() == "N".equals(values[1])) ) {
-				NetworkDCQ.getCommunication().getConsumer().newHostStatus(new Host(values[0], "Y".equals(values[1])?true:false));
+			boolean changed = otherHosts.get(values[0]).updateHostStatus("Y".equals(values[1]));
+			if (changed) {
+				NetworkDCQ.getCommunication().getConsumer().newHostStatus(otherHosts.get(values[0]));
 			}
-			// Update host status
-	    	otherHosts.get(values[0]).updateHostStatus("Y".equals(values[1])?true:false);
 	    }
 	}
 

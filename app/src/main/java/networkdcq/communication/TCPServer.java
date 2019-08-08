@@ -73,9 +73,11 @@ public class TCPServer extends TCPListener implements Runnable {
             }
             catch (IOException ex) {
                 // Tell the app that the connection with the host is lost, or has too many errors
-            	String ip = socket.getInetAddress().toString().substring(1);
-            	NetworkDCQ.getCommunication().getConsumer().byeHost(new Host(ip, false));
-            	HostDiscovery.removeHost(ip);
+				if (socket!=null) {
+					String ip = socket.getInetAddress().toString().substring(1);
+					NetworkDCQ.getCommunication().getConsumer().byeHost(new Host(ip, false));
+					HostDiscovery.removeHost(ip);
+				}
             	ok = false;
             }
             catch (Exception e) { 
@@ -83,10 +85,13 @@ public class TCPServer extends TCPListener implements Runnable {
             }
         }
         try {
-        	socket.close();
+        	if (socket!=null)
+        		socket.close();
         }
         catch (Exception e) {
         	Logger.e(e.getMessage());
-        }
+        } finally {
+        	socket = null;
+		}
     }
 }

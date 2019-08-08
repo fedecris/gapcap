@@ -55,10 +55,7 @@ class UDPDiscovery extends HostDiscovery implements Runnable {
 	 * Stops UDP host discovery.  The thread created in <code>startDiscovery()</code> end normally.
 	 */
 	public void stopDiscovery() {
-
 		running = false;
-		otherHosts.clear();
-
 	}
 
 	/**
@@ -78,8 +75,8 @@ class UDPDiscovery extends HostDiscovery implements Runnable {
         	catch (Exception e) { 
         		Logger.w(e.getMessage()); 
         	}
-
 		}
+		otherHosts.clear();
 		
 	}
 	

@@ -19,6 +19,8 @@ public class Host implements Serializable, NetworkSerializable {
 	private boolean onLine;
 	/** Last ping (for timeOut validation) */
 	private long lastPing = System.currentTimeMillis();
+    /** Last status */
+    private boolean lastOnline;
 	
 	public String toString() {
 	    return " (" + hostIP + ") - " + (onLine?"Online":"Offline");
@@ -36,13 +38,26 @@ public class Host implements Serializable, NetworkSerializable {
         return onLine;
     }
 
-    public void setOnLine(boolean onLine) {
+    /** Set new online status and returns true if the status has changed */
+    public boolean setOnLine(boolean onLine) {
+        boolean changed = (onLine != this.lastOnline);
+        this.lastOnline = this.onLine;
         this.onLine = onLine;
+        return changed;
+    }
+
+    public boolean isLastOnLine() {
+        return lastOnline;
+    }
+
+    public void setLastOnLine(boolean onLine) {
+        this.lastOnline = onLine;
     }
     
     public Host(String hostIP, boolean onLine) {
         this.hostIP = hostIP;
         this.onLine = onLine;
+        this.lastOnline = onLine;
     }
 
 	public long getLastPing() {
@@ -95,9 +110,10 @@ public class Host implements Serializable, NetworkSerializable {
     }
     
 
-    public void updateHostStatus(boolean onLine) {
-    	setOnLine(onLine);
-    	setLastPing(System.currentTimeMillis());
+    /** Returns if new status changed online/offline */
+    public boolean updateHostStatus(boolean onLine) {
+        setLastPing(System.currentTimeMillis());
+        return setOnLine(onLine);
     }
 
 	@Override

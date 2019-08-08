@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 
 import networkdcq.NetworkDCQ;
 import networkdcq.util.Logger;
@@ -12,7 +13,9 @@ import networkdcq.util.Logger;
 
 
 public class TCPListener extends TCPNetwork implements Runnable {
-            
+
+    ArrayList<TCPServer> tcpServers = new ArrayList<TCPServer>();
+
     /**
      * Creates the TCP ServerSocket
      */
@@ -50,6 +53,23 @@ public class TCPListener extends TCPNetwork implements Runnable {
         	Logger.e(e.getMessage()); 
         }
     }
+
+    /**
+     * Close listeners
+     */
+    public void closeServer() {
+        super.closeServer();
+        for (TCPServer tcpServer: tcpServers) {
+            try {
+                if (socket != null)
+                    tcpServer.socket.close();
+            } catch (Exception e) {
+            } finally {
+                tcpServer.socket = null;
+            }
+        }
+        tcpServers.clear();
+    }
     
     /**
      * Waits for new connections and spawns a new thread each time
@@ -65,12 +85,16 @@ public class TCPListener extends TCPNetwork implements Runnable {
             if (NetworkDCQ.getCommunication().getSerializableData() == null) {
             	toBuffer = new ObjectOutputStream(output);
             	fromBuffer = new ObjectInputStream(input);
-            	new Thread(new TCPServer(socket, fromBuffer, toBuffer)).start();
+                TCPServer newTCP = new TCPServer(socket, fromBuffer, toBuffer);
+                tcpServers.add(newTCP);
+            	new Thread(newTCP).start();
             }
             else {
             	fromBufferSerializable = input;
             	toBufferSerializable = output;
-            	new Thread(new TCPServer(socket, fromBufferSerializable, toBufferSerializable)).start();
+                TCPServer newTCP = new TCPServer(socket, fromBufferSerializable, toBufferSerializable);
+                tcpServers.add(newTCP);
+            	new Thread(newTCP).start();
             }
             return true;
         }
