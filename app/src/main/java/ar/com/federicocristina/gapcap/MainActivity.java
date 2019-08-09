@@ -11,11 +11,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -727,6 +730,43 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.remote, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.goto_local) {
+            gotoLocal();
+        } else if (item.getItemId() == R.id.goto_client) {
+            gotoClient();
+        } else if (item.getItemId() == R.id.goto_server) {
+            Toast.makeText(getBaseContext(), "SERVER", Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void gotoLocal() {
+        appMode = Constants.APP_MODE_NORMAL;
+        LinearLayout layout = findViewById(R.id.main_linear_layout);
+        layout.setVisibility(View.VISIBLE);
+    }
+
+    public void gotoClient() {
+        appMode = Constants.APP_MODE_CLIENT;
+        LinearLayout layout = findViewById(R.id.main_linear_layout);
+        layout.setVisibility(View.INVISIBLE);
+    }
+
+    public void gotoServer() {
+        appMode = Constants.APP_MODE_SERVER;
+        LinearLayout layout = findViewById(R.id.main_linear_layout);
+        layout.setVisibility(View.INVISIBLE);
     }
 
 }

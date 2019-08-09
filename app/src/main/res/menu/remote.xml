@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/goto_local"
+        android:title="Local" />
+    <item
+        android:id="@+id/goto_client"
+        android:title="Connect to server" />
+    <item
+        android:id="@+id/goto_server"
+        android:title="Create server" />
+</menu>
