@@ -57,7 +57,8 @@ public class TCPCommunication extends NetworkCommunication implements Runnable{
 	@Override
 	public boolean stopService() {
 		listenerRunning = false;
-		listener.closeServer();
+		if (listener!=null)
+			listener.closeServer();
 		closeAllConnections();
 		return false;
 	}

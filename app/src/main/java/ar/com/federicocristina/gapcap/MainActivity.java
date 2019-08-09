@@ -96,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
     // Service mode? (soporte conexion remota para ejecutar acciones)
     public static Button serverModeButton;
     // Boton para coneccion remota y controlar
-    public static Button searchServerButton;
-    // Boton para coneccion remota y controlar
     public static Button connectToHostButton;
     // Boton para coneccion remota y controlar
     public static Spinner connectToHostSpinner;
@@ -136,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
         stealthModeSwitch = findViewById(R.id.switch_stealthMode);
         flashSwitch = findViewById(R.id.switch_flash);
         serverModeButton = findViewById(R.id.button_serverMode);
-        searchServerButton = findViewById(R.id.button_searchServers);
         connectToHostButton = findViewById(R.id.button_connectToHost);
         connectToHostSpinner = findViewById(R.id.spinner_connectToHost);
 
@@ -283,25 +280,21 @@ public class MainActivity extends AppCompatActivity {
     /** Activa o desactiva los botones segun el estado de grabacion */
     public void updateComponentsStatus(Boolean forceRecording) {
 
+        // Visualizacion segun modo actual
+        updateLayouts();
+
         // Modo Cliente?
         if (appMode == Constants.APP_MODE_CLIENT) {
-            serverModeButton.setEnabled(false);
             return;
         }
 
         // Modo Servidor?
         if (appMode == Constants.APP_MODE_SERVER) {
-            searchServerButton.setEnabled(false);
-            connectToHostButton.setEnabled(false);
-            connectToHostSpinner.setEnabled(false);
-            startButton.setEnabled(false);
-            stopButton.setEnabled(false);
             return;
         }
 
         // Modo normal? Habilitar opciones
         serverModeButton.setEnabled(!RecorderService.mRecordingStatus);
-        searchServerButton.setEnabled(!RecorderService.mRecordingStatus);
         connectToHostButton.setEnabled(!RecorderService.mRecordingStatus && connectToHostSpinner.getCount()>0);
         connectToHostSpinner.setEnabled(!RecorderService.mRecordingStatus && connectToHostSpinner.getCount()>0);
 
@@ -409,7 +402,6 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
         connectToHostSpinner.setAdapter(adapter);
         if (connectToHostSpinner.getCount()==0) {
-            searchServerButton.setText("SEARCH");
             connectToHostButton.setEnabled(false);
         }
         else {
@@ -453,7 +445,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 status.setText("Server closed the connection");
                 remoteHost = null;
-                appMode = Constants.APP_MODE_NORMAL;
                 connectToHostButton.setText("CONNECT");
                 updateComponentsStatus();
             }
@@ -503,27 +494,22 @@ public class MainActivity extends AppCompatActivity {
     /** Se selecciona un item de la lista de servidores */
     public void connectToServer(View view) {
         try {
-            if (appMode == Constants.APP_MODE_NORMAL && remoteHost == null) {
+            if (remoteHost == null) {
                 remoteHost = NetworkDCQ.getDiscovery().otherHosts.get((String)connectToHostSpinner.getSelectedItem());
                 NetworkData data = new NetworkData(NetworkData.ACTION_CONNECT);
                 NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
-                appMode = Constants.APP_MODE_CLIENT;
                 connectToHostButton.setText("CLOSE");
                 updateComponentsStatus(false);
                 startButton.setEnabled(true);
-                searchServerButton.setEnabled(false);
                 status.setText("Connecting to " + remoteHost.getHostIP());
                 return;
-            }
-            else if (appMode == Constants.APP_MODE_CLIENT && "CLOSE".equals(connectToHostButton.getText().toString())) {
+            } else if ("CLOSE".equals(connectToHostButton.getText().toString())) {
                 connectToHostButton.setText("CONNECT");
                 NetworkData data = new NetworkData(NetworkData.ACTION_DISCONNECT);
                 NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
                 remoteHost = null;
                 status.setText(R.string.RecordingStatusReady);
-                appMode = Constants.APP_MODE_NORMAL;
                 updateComponentsStatus(false);
-                searchServerButton.setEnabled(true);
                 return;
             }
         } catch (Exception e) {
@@ -531,29 +517,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    /** Conectar con un host remoto de la lista */
-    public void searchForRemoteHost(View v) throws Exception {
-        try {
-            if (appMode == Constants.APP_MODE_NORMAL && "SEARCH".equals(searchServerButton.getText().toString())) {
-                startNetwork();
-                NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
-                status.setText("Searching servers...");
-                searchServerButton.setText("STOP");
-                startButton.setEnabled(false);
-                stopButton.setEnabled(false);
-                serverModeButton.setEnabled(false);
-            }
-            else if (appMode == Constants.APP_MODE_NORMAL && "STOP".equals(searchServerButton.getText().toString())) {
-                status.setText(R.string.RecordingStatusReady);
-                searchServerButton.setText("SEARCH");
-                startButton.setEnabled(true);
-                serverModeButton.setEnabled(true);
-            }
-        } catch (Exception e) {
-            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
 
     /** Carga de configuración */
     protected void loadSharedPreferences() {
@@ -638,37 +601,19 @@ public class MainActivity extends AppCompatActivity {
     public void startServerMode(View view) {
 
         // SERVER MODE: Se inicio el modo server?
-        if (appMode == Constants.APP_MODE_NORMAL && "START SERVER".equals(serverModeButton.getText().toString())) {
-            try {
-                if (startNetwork()) {
-                    NetworkDCQ.getDiscovery().thisHost.setOnLine(true);
-                    appMode = Constants.APP_MODE_SERVER;
-                    serverModeButton.setText("STOP SERVER");
-                    status.setText("Waiting for connection...");
-                    updateComponentsStatus();
-                    Logger.e("ESTOY ONLINE? " + NetworkDCQ.getDiscovery().thisHost.isOnLine());
-                }
-            } catch (Exception e) {
-                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        if ("START SERVER".equals(serverModeButton.getText().toString())) {
+            NetworkDCQ.getDiscovery().thisHost.setOnLine(true);
+            serverModeButton.setText("STOP SERVER");
+            status.setText("Waiting for connection...");
+            updateComponentsStatus();
+        } else if ("STOP SERVER".equals(serverModeButton.getText().toString())) {
+            if (remoteHost!=null) {
+                NetworkDCQ.getCommunication().sendMessage(remoteHost, new NetworkData(NetworkData.NOTIFY_SERVER_CLOSE));
             }
-        } else {
-            // SERVER MODE: Cancelarlo? (no hubo conexion)
-            try {
-                if (appMode == Constants.APP_MODE_SERVER && "STOP SERVER".equals(serverModeButton.getText().toString())) {
-                    if (remoteHost!=null) {
-                        NetworkDCQ.getCommunication().sendMessage(remoteHost, new NetworkData(NetworkData.NOTIFY_SERVER_CLOSE));
-                    }
-                    NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
-                    appMode = Constants.APP_MODE_NORMAL;
-                    serverModeButton.setText("START SERVER");
-                    status.setText(R.string.RecordingStatusReady);
-                    updateComponentsStatus();
-                    Logger.e("ESTOY ONLINE? " + NetworkDCQ.getDiscovery().thisHost.isOnLine());
-                    return;
-                }
-            } catch (Exception e) {
-                Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+            NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
+            serverModeButton.setText("START SERVER");
+            status.setText(R.string.RecordingStatusReady);
+            updateComponentsStatus();
         }
     }
 
@@ -700,9 +645,9 @@ public class MainActivity extends AppCompatActivity {
     /** Finaliza los servicios de NetworkDCQ */
     protected void stopNetwork() {
         if (networkConsumer!=null) {
+            networkConsumer = null;
             NetworkDCQ.getDiscovery().stopDiscovery();
             NetworkDCQ.getCommunication().stopService();
-            networkConsumer = null;
         }
     }
 
@@ -740,33 +685,65 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (item.getItemId() == R.id.goto_local) {
-            gotoLocal();
-        } else if (item.getItemId() == R.id.goto_client) {
-            gotoClient();
-        } else if (item.getItemId() == R.id.goto_server) {
-            Toast.makeText(getBaseContext(), "SERVER", Toast.LENGTH_SHORT).show();
+        try {
+            if (item.getItemId() == R.id.goto_local) {
+                stopNetwork();
+                appMode = Constants.APP_MODE_NORMAL;
+                updateLayouts();
+            } else if (item.getItemId() == R.id.goto_client) {
+                startNetwork();
+                NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
+                appMode = Constants.APP_MODE_CLIENT;
+                updateLayouts();
+            } else if (item.getItemId() == R.id.goto_server) {
+                startNetwork();
+                NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
+                appMode = Constants.APP_MODE_SERVER;
+                updateLayouts();
+            }
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void gotoLocal() {
-        appMode = Constants.APP_MODE_NORMAL;
-        LinearLayout layout = findViewById(R.id.main_linear_layout);
-        layout.setVisibility(View.VISIBLE);
-    }
-
-    public void gotoClient() {
-        appMode = Constants.APP_MODE_CLIENT;
-        LinearLayout layout = findViewById(R.id.main_linear_layout);
-        layout.setVisibility(View.INVISIBLE);
-    }
-
-    public void gotoServer() {
-        appMode = Constants.APP_MODE_SERVER;
-        LinearLayout layout = findViewById(R.id.main_linear_layout);
-        layout.setVisibility(View.INVISIBLE);
+    /** Oculta o visualiza partes de la interfaz segun el modo */
+    public void updateLayouts() {
+        // NORMAL MODE
+        if (appMode == Constants.APP_MODE_NORMAL) {
+            LinearLayout layout = findViewById(R.id.layout_modifiers);
+            layout.setVisibility(View.VISIBLE);
+            layout = findViewById(R.id.layout_server);
+            layout.setVisibility(View.GONE);
+            layout = findViewById(R.id.layout_client);
+            layout.setVisibility(View.GONE);
+            layout = findViewById(R.id.layout_startsop);
+            layout.setVisibility(View.VISIBLE);
+        // CLIENT MODE
+        } else if (appMode == Constants.APP_MODE_CLIENT) {
+            if (remoteHost==null) {
+                startButton.setEnabled(false);
+                stopButton.setEnabled(false);
+            }
+            LinearLayout layout = findViewById(R.id.layout_modifiers);
+            layout.setVisibility(View.GONE);
+            layout = findViewById(R.id.layout_server);
+            layout.setVisibility(View.GONE);
+            layout = findViewById(R.id.layout_client);
+            layout.setVisibility(View.VISIBLE);
+            layout = findViewById(R.id.layout_startsop);
+            layout.setVisibility(View.VISIBLE);
+        // NORMAL MODE SERVER MODE
+        } else if (appMode == Constants.APP_MODE_SERVER) {
+            LinearLayout layout = findViewById(R.id.layout_modifiers);
+            layout.setVisibility(View.VISIBLE);
+            layout = findViewById(R.id.layout_server);
+            layout.setVisibility(View.VISIBLE);
+            layout = findViewById(R.id.layout_client);
+            layout.setVisibility(View.GONE);
+            layout = findViewById(R.id.layout_startsop);
+            layout.setVisibility(View.GONE);
+        }
     }
 
 }

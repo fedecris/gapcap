@@ -104,7 +104,7 @@ public class NetworkDCQ {
 			throw new Exception ("Cannot start broadcast without a producer");
 		
 		try {
-			if (HostDiscovery.NO_NETWORK_IP.equals(HostDiscovery.thisHost.getHostIP())) {
+			if (!HostDiscovery.connectionAvailable()) {
 				Logger.w("Cannot start network services.  No network detected");
 				return false;
 			}

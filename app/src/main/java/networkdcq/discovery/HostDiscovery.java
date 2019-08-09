@@ -35,15 +35,7 @@ public abstract class HostDiscovery {
 	 * Set this host IP
 	 */
 	static {
-		// Get IPv4 IP
-		thisHost = Host.getLocalHostAddresAndIP();
-		if (thisHost == null || thisHost.getHostIP() == null || thisHost.getHostIP().length() == 0) {
-			thisHost = new Host(NO_NETWORK_IP, false); 
-			Logger.w(NO_NETWORK_IP);
-		}
-		// Initially conected (if there is network connection)
-		if (!NO_NETWORK_IP.equals(thisHost.getHostIP()))
-				thisHost.setOnLine(true);
+		connectionAvailable();
 	}
 	
 	/**
@@ -61,4 +53,20 @@ public abstract class HostDiscovery {
 			return thisHost.getHostIP();
 		return "";
 	}
+
+	public static boolean connectionAvailable() {
+		// Get IPv4 IP
+		thisHost = Host.getLocalHostAddresAndIP();
+		if (thisHost == null || thisHost.getHostIP() == null || thisHost.getHostIP().length() == 0) {
+			thisHost = new Host(NO_NETWORK_IP, false);
+			Logger.w(NO_NETWORK_IP);
+			return false;
+		}
+		// Initially conected (if there is network connection)
+		if (!NO_NETWORK_IP.equals(thisHost.getHostIP()))
+			thisHost.setOnLine(true);
+
+		return true;
+	}
+
 }

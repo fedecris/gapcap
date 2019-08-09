@@ -46,6 +46,7 @@
                 android:textSize="18sp" />
 
             <LinearLayout
+                android:id="@+id/layout_startsop"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
@@ -70,445 +71,462 @@
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Server mode" />
-
-            <Button
-                android:id="@+id/button_serverMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="startServerMode"
-                android:text="START SERVER" />
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Connect to server" />
-
-            <Spinner
-                android:id="@+id/spinner_connectToHost"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
             <LinearLayout
+                android:id="@+id/layout_server"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Server mode" />
 
                 <Button
-                    android:id="@+id/button_searchServers"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/button_serverMode"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="searchForRemoteHost"
-                    android:text="SEARCH" />
-
-                <Button
-                    android:id="@+id/button_connectToHost"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:onClick="connectToServer"
-                    android:text="CONNECT" />
-
+                    android:onClick="startServerMode"
+                    android:text="START SERVER" />
             </LinearLayout>
 
-            <Switch
-                android:id="@+id/switch_toBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:height="40dp"
-                android:text="Run in background" />
-
-            <View
-                android:id="@+id/divider15"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <Switch
-                android:id="@+id/switch_stealthMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Stealth mode" />
-
-            <View
-                android:id="@+id/divider4"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <Switch
-                android:id="@+id/switch_frontalCamera"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Front camera" />
-
-            <View
-                android:id="@+id/divider6"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <Switch
-                android:id="@+id/switch_flash"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Use flash" />
-
-            <View
-                android:id="@+id/divider16"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <Switch
-                android:id="@+id/switch_audio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Record audio" />
-
-            <View
-                android:id="@+id/divider7"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
             <LinearLayout
+                android:id="@+id/layout_client"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/textView_quality"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Video quality" />
-
-                <SeekBar
-                    android:id="@+id/seekBar_quality"
-                    style="@style/Widget.AppCompat.SeekBar.Discrete"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:max="10"
-                    android:progress="3" />
-            </LinearLayout>
-
-            <View
-                android:id="@+id/divider9"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:id="@+id/Focus_TextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Focus mode" />
-
-            <Spinner
-                android:id="@+id/spinner_focus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <View
-                android:id="@+id/divider5"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:id="@+id/videoSizetextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Video size" />
-
-            <Spinner
-                android:id="@+id/spinner_videoSize"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <View
-                android:id="@+id/divider8"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:id="@+id/captureFrameRateTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Capture frame rate (time lapse mode)" />
-
-            <LinearLayout
-                android:id="@+id/CAPTURE_FRAME_RATE"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <Switch
-                    android:id="@+id/switch_customCaptureFrameRate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/Custom" />
+                    android:text="Connect to server" />
 
                 <Spinner
-                    android:id="@+id/spinner_captureFrameRate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/spinner_connectToHost"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_weight="1" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/button_connectToHost"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:onClick="connectToServer"
+                        android:text="CONNECT" />
+
+                </LinearLayout>
             </LinearLayout>
 
-            <View
-                android:id="@+id/divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:id="@+id/videoFrameRateTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Video frame rate (per second)" />
-
             <LinearLayout
-                android:id="@+id/VIDEO_FRAME_RATE"
+                android:id="@+id/layout_modifiers"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <Switch
-                    android:id="@+id/switch_customVideoFrameRate"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/switch_toBackground"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/Custom" />
+                    android:height="40dp"
+                    android:text="Run in background" />
+
+                <View
+                    android:id="@+id/divider15"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <Switch
+                    android:id="@+id/switch_stealthMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Stealth mode" />
+
+                <View
+                    android:id="@+id/divider4"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <Switch
+                    android:id="@+id/switch_frontalCamera"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Front camera" />
+
+                <View
+                    android:id="@+id/divider6"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <Switch
+                    android:id="@+id/switch_flash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Use flash" />
+
+                <View
+                    android:id="@+id/divider16"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <Switch
+                    android:id="@+id/switch_audio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Record audio" />
+
+                <View
+                    android:id="@+id/divider7"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView_quality"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Video quality" />
+
+                    <SeekBar
+                        android:id="@+id/seekBar_quality"
+                        style="@style/Widget.AppCompat.SeekBar.Discrete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:max="10"
+                        android:progress="3" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider9"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/Focus_TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Focus mode" />
 
                 <Spinner
-                    android:id="@+id/spinner_videoFrameRate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-            </LinearLayout>
+                    android:id="@+id/spinner_focus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-            <View
-                android:id="@+id/divider2"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:id="@+id/delayStartTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Delay start (0 starts inmediatly)" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/editText_delayStart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:ems="10"
-                    android:inputType="number" />
+                <View
+                    android:id="@+id/divider5"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
 
                 <TextView
-                    android:id="@+id/textView_secsDelay"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/videoSizetextView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Seconds" />
-            </LinearLayout>
+                    android:text="Video size" />
 
-            <View
-                android:id="@+id/divider10"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
+                <Spinner
+                    android:id="@+id/spinner_videoSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-            <TextView
-                android:id="@+id/lmitSize_textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Limit size (0 no limit)" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/limitSizeEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:ems="10"
-                    android:inputType="number" />
+                <View
+                    android:id="@+id/divider8"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
 
                 <TextView
-                    android:id="@+id/MB_textView"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/captureFrameRateTextView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Megabytes" />
-            </LinearLayout>
+                    android:text="Capture frame rate (time lapse mode)" />
 
-            <View
-                android:id="@+id/divider11"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
+                <LinearLayout
+                    android:id="@+id/CAPTURE_FRAME_RATE"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/limitTime_textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Limit time (0 no limit)" />
+                    <Switch
+                        android:id="@+id/switch_customCaptureFrameRate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/Custom" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                    <Spinner
+                        android:id="@+id/spinner_captureFrameRate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
 
-                <EditText
-                    android:id="@+id/limitTimeEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:ems="10"
-                    android:inputType="number" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
 
                 <TextView
-                    android:id="@+id/secs_textView"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/videoFrameRateTextView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Seconds" />
+                    android:text="Video frame rate (per second)" />
+
+                <LinearLayout
+                    android:id="@+id/VIDEO_FRAME_RATE"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <Switch
+                        android:id="@+id/switch_customVideoFrameRate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/Custom" />
+
+                    <Spinner
+                        android:id="@+id/spinner_videoFrameRate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/delayStartTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delay start (0 starts inmediatly)" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/editText_delayStart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:ems="10"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/textView_secsDelay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Seconds" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider10"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/lmitSize_textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Limit size (0 no limit)" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/limitSizeEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:ems="10"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/MB_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Megabytes" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider11"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/limitTime_textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Limit time (0 no limit)" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/limitTimeEditText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:ems="10"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/secs_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Seconds" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/divider12"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <Switch
+                    android:id="@+id/switch_repeatAtLimit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Repeat after limit" />
+
+                <View
+                    android:id="@+id/divider3"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/PathView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Filename path" />
+
+                <EditText
+                    android:id="@+id/editText_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:height="50dp"
+                    android:autofillHints=""
+                    android:background="@android:color/transparent"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    tools:targetApi="o" />
+
+                <View
+                    android:id="@+id/divider13"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/FilePrefixView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Filename prefix" />
+
+                <EditText
+                    android:id="@+id/editText_filePrefix"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:ems="10"
+                    android:inputType="textPersonName" />
+
+                <View
+                    android:id="@+id/divider14"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/FilenameTimeStamptextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Filename timestamp" />
+
+                <EditText
+                    android:id="@+id/editText_filenameTimestamp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:ems="10"
+                    android:inputType="textPersonName" />
+
             </LinearLayout>
 
-            <View
-                android:id="@+id/divider12"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
 
-            <Switch
-                android:id="@+id/switch_repeatAtLimit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Repeat after limit" />
+            </LinearLayout>
 
-            <View
-                android:id="@+id/divider3"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
 
-            <TextView
-                android:id="@+id/PathView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filename path" />
-
-            <EditText
-                android:id="@+id/editText_path"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:height="50dp"
-                android:autofillHints=""
-                android:background="@android:color/transparent"
-                android:ems="10"
-                android:inputType="textPersonName"
-                tools:targetApi="o" />
-
-            <View
-                android:id="@+id/divider13"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:id="@+id/FilePrefixView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filename prefix" />
-
-            <EditText
-                android:id="@+id/editText_filePrefix"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:ems="10"
-                android:inputType="textPersonName" />
-
-            <View
-                android:id="@+id/divider14"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/HorizontalDividerSeparation"
-                android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
-                android:background="?android:attr/listDivider" />
-
-            <TextView
-                android:id="@+id/FilenameTimeStamptextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Filename timestamp" />
-
-            <EditText
-                android:id="@+id/editText_filenameTimestamp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:ems="10"
-                android:inputType="textPersonName" />
-
-        </LinearLayout>
     </ScrollView>
 
 </android.support.constraint.ConstraintLayout>
