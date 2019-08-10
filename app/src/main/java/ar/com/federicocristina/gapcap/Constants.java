@@ -76,6 +76,18 @@ class Constants {
     static final String PREFERENCE_STEALTH_MODE                    = "STEALTH_MODE";
     // Shared preference: usar flash?
     static final String PREFERENCE_USE_FLASH                       = "USE_FLASH";
+    // Shared preference: status text
+    static final String PREFERENCE_STATUS_STATUS_TEXT              = "STATUS_STATUS_TEXT";
+    // Shared preference: status start server button
+    static final String PREFERENCE_STATUS_START_SERVER_BUTTON      = "STATUS_START_SERVER_BUTTON";
+    // Shared preference: connect to server button
+    static final String PREFERENCE_STATUS_CONNECT_SERVER_BUTTON    = "STATUS_CONNECT_SERVER_BUTTON";
+    // Shared preference: status start server button
+    static final String PREFERENCE_STATUS_SERVERS_LIST             = "STATUS_SERVERS_LIST";
+    // Shared preference: connect to server button
+    static final String PREFERENCE_STATUS_SELECTED_SERVER          = "STATUS_SELECTED_SERVER";
+
+
 
 
 

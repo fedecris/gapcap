@@ -7,13 +7,18 @@ import android.media.AudioManager;
 import android.os.Environment;
 import android.view.Surface;
 import android.view.WindowManager;
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Utils {
 
@@ -174,6 +179,22 @@ public class Utils {
         }
     }
 
+    /** Retorna un set con todas las opciones del spinner */
+    public static Set<String> retrieveAllItems(Spinner spinner) {
+        Set<String> set = new HashSet<String>();
+        for (int i = 0; i < spinner.getCount(); i++) {
+            set.add(spinner.getItemAtPosition(i).toString());
+        }
+        return set;
+    }
+
+    public static void setAllItems(Context context, Spinner spinner, Set<String> set) {
+        ArrayList<String> opciones = new ArrayList<String>();
+        if (set!=null)
+            opciones.addAll(set);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>( context, R.layout.spinner_item_custom, opciones);
+        spinner.setAdapter(adapter);
+    }
 
 }
 

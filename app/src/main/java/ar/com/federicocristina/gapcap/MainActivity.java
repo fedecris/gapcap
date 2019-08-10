@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import networkdcq.Host;
@@ -42,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
     static PendingIntent pendingIntent;
     // Message para interactuar con el servicio de grabacion
     Messenger messenger = new Messenger(new ResponseHandler());
-    // Modo de aplicacion: normal, sirviendo, cliente
-    public static int appMode = Constants.APP_MODE_NORMAL;
     // Consumer de notificaciones
     static NetworkConsumer networkConsumer;
     // Host remoto (ya sea el cliente o el servidor segun sea el caso)
@@ -94,11 +93,11 @@ public class MainActivity extends AppCompatActivity {
     // Use Flash?
     public Switch flashSwitch;
     // Service mode? (soporte conexion remota para ejecutar acciones)
-    public static Button serverModeButton;
+    public Button serverModeButton;
     // Boton para coneccion remota y controlar
-    public static Button connectToHostButton;
+    public Button connectToHostButton;
     // Boton para coneccion remota y controlar
-    public static Spinner connectToHostSpinner;
+    public Spinner connectToHostSpinner;
 
 
     @Override
@@ -186,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     public void iniciar(View v) {
 
         // CLIENT MODE: Enviar START al host remoto?
-        if (appMode == Constants.APP_MODE_CLIENT && remoteHost != null) {
+        if (RecorderService.appMode == Constants.APP_MODE_CLIENT && remoteHost != null) {
             NetworkData data = new NetworkData(NetworkData.ACTION_START);
             NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
             stopButton.setEnabled(true);
@@ -253,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
     public void detener(View v) {
 
         // CLIENT MODE: Enviar STOP recording al host remoto?
-        if (appMode == Constants.APP_MODE_CLIENT && remoteHost != null) {
+        if (RecorderService.appMode == Constants.APP_MODE_CLIENT && remoteHost != null) {
             NetworkData data = new NetworkData(NetworkData.ACTION_STOP);
             NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
             stopButton.setEnabled(false);
@@ -284,12 +283,12 @@ public class MainActivity extends AppCompatActivity {
         updateLayouts();
 
         // Modo Cliente?
-        if (appMode == Constants.APP_MODE_CLIENT) {
+        if (RecorderService.appMode == Constants.APP_MODE_CLIENT) {
             return;
         }
 
         // Modo Servidor?
-        if (appMode == Constants.APP_MODE_SERVER) {
+        if (RecorderService.appMode == Constants.APP_MODE_SERVER) {
             return;
         }
 
@@ -304,13 +303,13 @@ public class MainActivity extends AppCompatActivity {
         // Existe una operacion de schedule?
         long current = System.currentTimeMillis();
         if (current < lastScheduled) {
-            status.setText("Scheduled: " + Utils.getDateTimeFor("yyyy-MM-dd HH:mm:ss", lastScheduled));
+            status.setText("Scheduled: " + Utils.getDateTimeFor(getString(R.string.DateTimeFormat), lastScheduled));
             startButton.setEnabled(false);
-            stopButton.setText("CANCEL");
+            stopButton.setText(R.string.Cancel);
             stopButton.setEnabled(true);
         } else {
             status.setText((forceRecording != null && forceRecording) || RecorderService.mRecordingStatus ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
-            stopButton.setText("STOP");
+            stopButton.setText(R.string.Stop);
             startButton.setEnabled(forceRecording !=null ? !forceRecording : !RecorderService.mRecordingStatus);
             stopButton.setEnabled(forceRecording != null? forceRecording : RecorderService.mRecordingStatus);
         }
@@ -395,7 +394,6 @@ public class MainActivity extends AppCompatActivity {
     public void loadAvailableServers() {
         ArrayList<String> opciones = new ArrayList<String>();
         for (String ip : NetworkDCQ.getDiscovery().otherHosts.keySet()) {
-            Logger.w(NetworkDCQ.getDiscovery().otherHosts.get(ip).getHostIP() + " -> " + NetworkDCQ.getDiscovery().otherHosts.get(ip).isOnLine());
             if (NetworkDCQ.getDiscovery().otherHosts.get(ip).isOnLine())
             opciones.add(ip);
         }
@@ -445,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 status.setText("Server closed the connection");
                 remoteHost = null;
-                connectToHostButton.setText("CONNECT");
+                connectToHostButton.setText(R.string.Connect);
                 updateComponentsStatus();
             }
         });
@@ -498,19 +496,17 @@ public class MainActivity extends AppCompatActivity {
                 remoteHost = NetworkDCQ.getDiscovery().otherHosts.get((String)connectToHostSpinner.getSelectedItem());
                 NetworkData data = new NetworkData(NetworkData.ACTION_CONNECT);
                 NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
-                connectToHostButton.setText("CLOSE");
+                connectToHostButton.setText(R.string.Close);
                 updateComponentsStatus(false);
                 startButton.setEnabled(true);
                 status.setText("Connecting to " + remoteHost.getHostIP());
-                return;
-            } else if ("CLOSE".equals(connectToHostButton.getText().toString())) {
-                connectToHostButton.setText("CONNECT");
+            } else {
+                connectToHostButton.setText(R.string.Connect);
                 NetworkData data = new NetworkData(NetworkData.ACTION_DISCONNECT);
                 NetworkDCQ.getCommunication().sendMessage(remoteHost, data);
                 remoteHost = null;
                 status.setText(R.string.RecordingStatusReady);
                 updateComponentsStatus(false);
-                return;
             }
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -540,6 +536,13 @@ public class MainActivity extends AppCompatActivity {
         repeatAtLimitSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, false));
         stealthModeSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_STEALTH_MODE, false));
         flashSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_USE_FLASH, false));
+        status.setText(preferences.getString(Constants.PREFERENCE_STATUS_STATUS_TEXT, getString(R.string.RecordingStatusReady)));
+        serverModeButton.setText(preferences.getInt(Constants.PREFERENCE_STATUS_START_SERVER_BUTTON, R.string.StartServer));
+        connectToHostButton.setText(preferences.getInt(Constants.PREFERENCE_STATUS_CONNECT_SERVER_BUTTON, R.string.Connect));
+        Utils.setAllItems(this, connectToHostSpinner, preferences.getStringSet(Constants.PREFERENCE_STATUS_SERVERS_LIST, null));
+        if (preferences.getInt(Constants.PREFERENCE_STATUS_SELECTED_SERVER, -1) > -1) {
+            connectToHostSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_STATUS_SELECTED_SERVER, -1));
+        }
     }
 
     /** Almacenamiento de configuración */
@@ -566,13 +569,17 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked());
+        editor.putString(Constants.PREFERENCE_STATUS_STATUS_TEXT, status.getText().toString());
+        editor.putInt(Constants.PREFERENCE_STATUS_START_SERVER_BUTTON, getString(R.string.StartServer).equals(serverModeButton.getText().toString()) ? R.string.StartServer : R.string.StopServer );
+        editor.putInt(Constants.PREFERENCE_STATUS_CONNECT_SERVER_BUTTON, getString(R.string.Connect).equals(connectToHostButton.getText().toString()) ? R.string.Connect : R.string.Close);
+        editor.putStringSet(Constants.PREFERENCE_STATUS_SERVERS_LIST, Utils.retrieveAllItems(connectToHostSpinner));
+        editor.putInt(Constants.PREFERENCE_STATUS_SELECTED_SERVER, connectToHostSpinner.getSelectedItemPosition());
         editor.commit();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        stopNetwork();
         saveSharedPreferences();
     }
 
@@ -601,17 +608,17 @@ public class MainActivity extends AppCompatActivity {
     public void startServerMode(View view) {
 
         // SERVER MODE: Se inicio el modo server?
-        if ("START SERVER".equals(serverModeButton.getText().toString())) {
+        if (getString(R.string.StartServer).equals(serverModeButton.getText().toString())) {
             NetworkDCQ.getDiscovery().thisHost.setOnLine(true);
-            serverModeButton.setText("STOP SERVER");
+            serverModeButton.setText(R.string.StopServer);
             status.setText("Waiting for connection...");
             updateComponentsStatus();
-        } else if ("STOP SERVER".equals(serverModeButton.getText().toString())) {
+        } else if (getString(R.string.StopServer).equals(serverModeButton.getText().toString())) {
             if (remoteHost!=null) {
                 NetworkDCQ.getCommunication().sendMessage(remoteHost, new NetworkData(NetworkData.NOTIFY_SERVER_CLOSE));
             }
             NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
-            serverModeButton.setText("START SERVER");
+            serverModeButton.setText(R.string.StartServer);
             status.setText(R.string.RecordingStatusReady);
             updateComponentsStatus();
         }
@@ -644,10 +651,17 @@ public class MainActivity extends AppCompatActivity {
 
     /** Finaliza los servicios de NetworkDCQ */
     protected void stopNetwork() {
-        if (networkConsumer!=null) {
+        try {
+            if (networkConsumer!=null) {
+                networkConsumer = null;
+                NetworkDCQ.getDiscovery().stopDiscovery();
+                NetworkDCQ.getCommunication().stopService();
+            }
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+        } finally {
             networkConsumer = null;
-            NetworkDCQ.getDiscovery().stopDiscovery();
-            NetworkDCQ.getCommunication().stopService();
+            remoteHost = null;
         }
     }
 
@@ -688,17 +702,21 @@ public class MainActivity extends AppCompatActivity {
         try {
             if (item.getItemId() == R.id.goto_local) {
                 stopNetwork();
-                appMode = Constants.APP_MODE_NORMAL;
+                RecorderService.appMode = Constants.APP_MODE_NORMAL;
                 updateLayouts();
+                updateComponentsStatus();
             } else if (item.getItemId() == R.id.goto_client) {
                 startNetwork();
                 NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
-                appMode = Constants.APP_MODE_CLIENT;
+                RecorderService.appMode = Constants.APP_MODE_CLIENT;
+                serverModeButton.setText(R.string.Connect);
                 updateLayouts();
+                loadAvailableServers();
             } else if (item.getItemId() == R.id.goto_server) {
                 startNetwork();
                 NetworkDCQ.getDiscovery().thisHost.setOnLine(false);
-                appMode = Constants.APP_MODE_SERVER;
+                RecorderService.appMode = Constants.APP_MODE_SERVER;
+                serverModeButton.setText(R.string.StartServer);
                 updateLayouts();
             }
         } catch (Exception e) {
@@ -710,7 +728,7 @@ public class MainActivity extends AppCompatActivity {
     /** Oculta o visualiza partes de la interfaz segun el modo */
     public void updateLayouts() {
         // NORMAL MODE
-        if (appMode == Constants.APP_MODE_NORMAL) {
+        if (RecorderService.appMode == Constants.APP_MODE_NORMAL) {
             LinearLayout layout = findViewById(R.id.layout_modifiers);
             layout.setVisibility(View.VISIBLE);
             layout = findViewById(R.id.layout_server);
@@ -720,7 +738,7 @@ public class MainActivity extends AppCompatActivity {
             layout = findViewById(R.id.layout_startsop);
             layout.setVisibility(View.VISIBLE);
         // CLIENT MODE
-        } else if (appMode == Constants.APP_MODE_CLIENT) {
+        } else if (RecorderService.appMode == Constants.APP_MODE_CLIENT) {
             if (remoteHost==null) {
                 startButton.setEnabled(false);
                 stopButton.setEnabled(false);
@@ -734,7 +752,7 @@ public class MainActivity extends AppCompatActivity {
             layout = findViewById(R.id.layout_startsop);
             layout.setVisibility(View.VISIBLE);
         // NORMAL MODE SERVER MODE
-        } else if (appMode == Constants.APP_MODE_SERVER) {
+        } else if (RecorderService.appMode == Constants.APP_MODE_SERVER) {
             LinearLayout layout = findViewById(R.id.layout_modifiers);
             layout.setVisibility(View.VISIBLE);
             layout = findViewById(R.id.layout_server);

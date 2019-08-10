@@ -29,7 +29,7 @@ public class NetworkConsumer implements NetworkApplicationDataConsumer {
     public void newData(NetworkApplicationData receivedData) {
         NetworkData data = (NetworkData)receivedData;
         // Si estamos en modo server
-        if (MainActivity.appMode == Constants.APP_MODE_SERVER) {
+        if (RecorderService.appMode == Constants.APP_MODE_SERVER) {
             // Conexion: No aceptar otro host si ya hay uno conectado
             if (data.event == NetworkData.ACTION_CONNECT && !RecorderService.mRecordingStatus /*&& owner.remoteHost != null && NetworkDCQ.getDiscovery().thisHost.isOnLine()*/) {
                 owner.remoteHost = data.getSourceHost();
@@ -54,7 +54,7 @@ public class NetworkConsumer implements NetworkApplicationDataConsumer {
                 NetworkDCQ.getCommunication().sendMessage(owner.remoteHost,  response);
                 owner.detener();
             }
-        } else if (MainActivity.appMode == Constants.APP_MODE_CLIENT) {
+        } else if (RecorderService.appMode == Constants.APP_MODE_CLIENT) {
             if (data.event == NetworkData.STATUS_RECORDING) {
                 owner.remoteRecording();
             } else if (data.event == NetworkData.STATUS_STOPPED) {

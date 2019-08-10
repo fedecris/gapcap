@@ -10,4 +10,9 @@
     <string name="Start">START</string>
     <string name="Stop">STOP</string>
     <string name="Cancel">CANCEL</string>
+    <string name="Connect">CONNECT</string>
+    <string name="Close">CLOSE</string>
+    <string name="StartServer">START SERVER</string>
+    <string name="StopServer">STOP SERVER</string>
+    <string name="DateTimeFormat">yyyy-MM-dd HH:mm:ss</string>
 </resources>
