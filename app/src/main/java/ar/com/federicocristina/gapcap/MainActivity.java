@@ -284,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Modo Cliente?
         if (RecorderService.appMode == Constants.APP_MODE_CLIENT) {
+            loadAvailableServers();
             return;
         }
 
