@@ -20,8 +20,6 @@ public class RecorderService extends Service {
 
     // Tag Logcat
     private static final String TAG = "RecorderService";
-    // Modo de aplicacion: normal, sirviendo, cliente
-    public static int appMode = Constants.APP_MODE_NORMAL;
     // Estado de grabacion
     public static boolean mRecordingStatus = false;
     // Servicio de camara

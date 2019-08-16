@@ -72,60 +72,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/layout_server"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Server mode" />
-
-                <Button
-                    android:id="@+id/button_serverMode"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="startServerMode"
-                    android:text="START SERVER" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/layout_client"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Connect to server" />
-
-                <Spinner
-                    android:id="@+id/spinner_connectToHost"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/button_connectToHost"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:onClick="connectToServer"
-                        android:text="CONNECT" />
-
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/layout_modifiers"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

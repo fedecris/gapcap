@@ -1,13 +1,11 @@
 package ar.com.federicocristina.gapcap;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.os.Environment;
 import android.view.Surface;
 import android.view.WindowManager;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 

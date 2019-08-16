@@ -2,14 +2,6 @@ package ar.com.federicocristina.gapcap;
 
 class Constants {
 
-    // Modo de aplicacion tradicional
-    static final int APP_MODE_NORMAL                               = 0;
-    // Modo de aplicacion server (controlado remotamente)
-    static final int APP_MODE_SERVER                               = 1;
-    // Modo de aplicacion client (controla instancia remota)
-    static final int APP_MODE_CLIENT                               = 2;
-
-
     // Key para intercambio del messenger
     static final String MESSENGER                                  = "Messenger";
     // Notificacion de Error
@@ -78,14 +70,7 @@ class Constants {
     static final String PREFERENCE_USE_FLASH                       = "USE_FLASH";
     // Shared preference: status text
     static final String PREFERENCE_STATUS_STATUS_TEXT              = "STATUS_STATUS_TEXT";
-    // Shared preference: status start server button
-    static final String PREFERENCE_STATUS_START_SERVER_BUTTON      = "STATUS_START_SERVER_BUTTON";
-    // Shared preference: connect to server button
-    static final String PREFERENCE_STATUS_CONNECT_SERVER_BUTTON    = "STATUS_CONNECT_SERVER_BUTTON";
-    // Shared preference: status start server button
-    static final String PREFERENCE_STATUS_SERVERS_LIST             = "STATUS_SERVERS_LIST";
-    // Shared preference: connect to server button
-    static final String PREFERENCE_STATUS_SELECTED_SERVER          = "STATUS_SELECTED_SERVER";
+
 
 
 
