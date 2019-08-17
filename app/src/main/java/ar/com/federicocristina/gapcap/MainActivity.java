@@ -55,12 +55,18 @@ public class MainActivity extends AppCompatActivity {
     public SeekBar qualitySeekBar;
     // Grabar audio?
     public Switch recordAudioSwitch;
-    // Video Size
-    public Spinner videoSizeSpinner;
-    // Custom Video Frame Rate
-    public Switch customVideoFrameRateSwitch;
-    // Video Frame Rate
-    public Spinner videoFrameRateSpinner;
+    // Video Size back cam
+    public Spinner videoSizeBackSpinner;
+    // Video Size fron cam
+    public Spinner videoSizeFrontSpinner;
+    // Custom Video Frame Rate Back
+    public Switch customVideoFrameRateBackSwitch;
+    // Custom Video Frame Rate Front
+    public Switch customVideoFrameRateFrontSwitch;
+    // Video Frame Rate Back cam
+    public Spinner videoFrameRateBackSpinner;
+    // Video Frame Rate Front cam
+    public Spinner videoFrameRateFrontSpinner;
     // Custom Capture Frame Rate
     public Switch customCaptureFrameRateSwitch;
     // Capture Frame Rate
@@ -73,10 +79,14 @@ public class MainActivity extends AppCompatActivity {
     public EditText limitTimeSecsEditText;
     // Demorar inicio
     public EditText delayStartSecsEditText;
-    // Focus
-    public Spinner focusModeSpinner;
+    // Focus mode back cam
+    public Spinner focusModeBackSpinner;
+    // Focus mode front cam
+    public Spinner focusModeFrontSpinner;
     // Repetir una vez llegado el limite?
     public Switch repeatAtLimitSwitch;
+    // Alternar camara al repetir?
+    public Switch swapCamAtRepeatSwitch;
     // Stealth mode
     public Switch stealthModeSwitch;
     // Use Flash?
@@ -102,25 +112,31 @@ public class MainActivity extends AppCompatActivity {
         fileDateFormatEditText = findViewById(R.id.editText_filenameTimestamp);
         qualitySeekBar = findViewById(R.id.seekBar_quality);
         recordAudioSwitch = findViewById(R.id.switch_audio);
-        customVideoFrameRateSwitch = findViewById(R.id.switch_customVideoFrameRate);
+        customVideoFrameRateBackSwitch = findViewById(R.id.switch_customVideoFrameRateBack);
+        customVideoFrameRateFrontSwitch = findViewById(R.id.switch_customVideoFrameRateFront);
         customCaptureFrameRateSwitch = findViewById(R.id.switch_customCaptureFrameRate);
-        videoFrameRateSpinner = findViewById(R.id.spinner_videoFrameRate);
+        videoFrameRateBackSpinner = findViewById(R.id.spinner_videoFrameRateBack);
+        videoFrameRateFrontSpinner = findViewById(R.id.spinner_videoFrameRateFront);
         captureFrameRateSpinner = findViewById(R.id.spinner_captureFrameRate);
         frontalCameraSwitch = findViewById(R.id.switch_frontalCamera);
         frontalCameraSwitch.setEnabled(Utils.existsFrontalCamera());
         limitSizeMBEditText = findViewById(R.id.limitSizeEditText);
         limitTimeSecsEditText = findViewById(R.id.limitTimeEditText);
         delayStartSecsEditText = findViewById(R.id.editText_delayStart);
-        focusModeSpinner = findViewById(R.id.spinner_focus);
+        focusModeBackSpinner = findViewById(R.id.spinner_focusBack);
+        focusModeFrontSpinner = findViewById(R.id.spinner_focusFront);
         repeatAtLimitSwitch = findViewById(R.id.switch_repeatAtLimit);
+        swapCamAtRepeatSwitch = findViewById(R.id.Switch_swapCamAtRepeat);
         stealthModeSwitch = findViewById(R.id.switch_stealthMode);
         flashSwitch = findViewById(R.id.switch_flash);
+        videoSizeBackSpinner = (Spinner)findViewById(R.id.spinner_videoSizeBack);
+        videoSizeFrontSpinner = (Spinner)findViewById(R.id.spinner_videoSizeFront);
+        focusModeBackSpinner = (Spinner)findViewById(R.id.spinner_focusBack);
+        focusModeFrontSpinner = (Spinner)findViewById(R.id.spinner_focusFront);
 
         // Recuperar la configuracion de las camaras y cargar los componentes visuales
         Utils.retrieveCameraFeatures(getBaseContext());
-        loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
-        loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
-        loadSupportedFocusModes(frontalCameraSwitch.isChecked());
+        reLoadVideoSizesAndVideoFrameRateAndFocusModes();
         loadCaptureFrameRates();
 
         // Listener frontal camera switch
@@ -131,11 +147,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Listener custom video frame rate
-        customVideoFrameRateSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        // Listener custom video frame rate back
+        customVideoFrameRateBackSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                customVideoFrameRateChanged();
+                customVideoFrameRateChanged( videoFrameRateBackSpinner, customVideoFrameRateBackSwitch);
+            }
+        });
+
+        // Listener custom video frame rate front
+        customVideoFrameRateFrontSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                customVideoFrameRateChanged( videoFrameRateFrontSpinner, customVideoFrameRateFrontSwitch);
             }
         });
 
@@ -147,6 +171,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Listener limit
+        repeatAtLimitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateComponentsStatus();
+            }
+        });
 
         // Status actual de componentes
         loadSharedPreferences();
@@ -179,20 +210,26 @@ public class MainActivity extends AppCompatActivity {
         alarmIntent.putExtra(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
         alarmIntent.putExtra(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
         alarmIntent.putExtra(Constants.PREFERENCE_QUALIY, qualitySeekBar.getProgress());
-        alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, customVideoFrameRateSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE, Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString()));
+        alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK, customVideoFrameRateBackSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT, customVideoFrameRateFrontSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE_BACK, Integer.parseInt(videoFrameRateBackSpinner.getSelectedItem().toString()));
+        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE_FRONT, Integer.parseInt(videoFrameRateFrontSpinner.getSelectedItem().toString()));
         alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked());
         alarmIntent.putExtra(Constants.PREFERENCE_CAPTURE_FRAME_RATE, Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()));
         alarmIntent.putExtra(Constants.PREFERENCE_LIMIT_SIZE, Integer.parseInt(limitSizeMBEditText.getText().toString()));
         alarmIntent.putExtra(Constants.PREFERENCE_LIMIT_TIME, Integer.parseInt(limitTimeSecsEditText.getText().toString()));
-        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItem().toString());
-        alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItem().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_SIZE_BACK, videoSizeBackSpinner.getSelectedItem().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_SIZE_FRONT, videoSizeFrontSpinner.getSelectedItem().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE_BACK, focusModeBackSpinner.getSelectedItem().toString());
+        alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE_FRONT, focusModeFrontSpinner.getSelectedItem().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
         alarmIntent.putExtra(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
+        alarmIntent.putExtra(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT, swapCamAtRepeatSwitch.isChecked());
         alarmIntent.putExtra(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
         alarmIntent.putExtra(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked());
+
 
         // Programar el inicio del servicio de grabacion, o bien iniciar inmediatamente
         if (Integer.parseInt(delayStartSecsEditText.getText().toString()) > 0) {
@@ -242,7 +279,26 @@ public class MainActivity extends AppCompatActivity {
     public void updateComponentsStatus(Boolean forceRecording) {
 
         // Estado componentes sin importar el modo de grabacion
-        customVideoFrameRateSwitch.setEnabled(false); // Se habilita o no dependiendo del timelapse mode
+        customVideoFrameRateBackSwitch.setEnabled(false); // Se habilita o no dependiendo del timelapse mode
+        customVideoFrameRateFrontSwitch.setEnabled(false); // Se habilita o no dependiendo del timelapse mode
+
+        // Swap de camaras habilitado solo si es posible
+        if ((!frontalCameraSwitch.isChecked() && !Utils.existsFrontalCamera()) || (frontalCameraSwitch.isChecked() && !Utils.existsBackCamera())) {
+            swapCamAtRepeatSwitch.setEnabled(false);
+            swapCamAtRepeatSwitch.setChecked(false);
+        } else {
+            swapCamAtRepeatSwitch.setEnabled(repeatAtLimitSwitch.isChecked());
+        }
+
+        // Habilitar frontal o back components segun existencia
+        focusModeBackSpinner.setEnabled(Utils.existsBackCamera());
+        focusModeFrontSpinner.setEnabled(Utils.existsFrontalCamera());
+        videoFrameRateBackSpinner.setEnabled(Utils.existsBackCamera());
+        videoFrameRateFrontSpinner.setEnabled(Utils.existsFrontalCamera());
+        customVideoFrameRateBackSwitch.setEnabled(Utils.existsBackCamera());
+        customVideoFrameRateFrontSwitch.setEnabled(Utils.existsFrontalCamera());
+        videoSizeBackSpinner.setEnabled(Utils.existsBackCamera());
+        videoSizeFrontSpinner.setEnabled(Utils.existsFrontalCamera());
 
         // Existe una operacion de schedule?
         long current = System.currentTimeMillis();
@@ -258,13 +314,23 @@ public class MainActivity extends AppCompatActivity {
             stopButton.setEnabled(forceRecording != null? forceRecording : RecorderService.mRecordingStatus);
         }
         customCaptureFrameRateChanged();
-        customVideoFrameRateChanged();
+        customVideoFrameRateChanged(videoFrameRateBackSpinner, customVideoFrameRateBackSwitch);
+        customVideoFrameRateChanged(videoFrameRateFrontSpinner, customVideoFrameRateFrontSwitch);
     }
 
     public void reLoadVideoSizesAndVideoFrameRateAndFocusModes() {
-        loadSupportedVideoSizes(frontalCameraSwitch.isChecked());
-        loadSupportedVideoFrameRates(frontalCameraSwitch.isChecked());
-        loadSupportedFocusModes(frontalCameraSwitch.isChecked());
+        if (Utils.existsBackCamera()) {
+            loadSupportedVideoSizes(false, videoSizeBackSpinner);
+            loadSupportedFocusModes(false, focusModeBackSpinner);
+            loadSupportedVideoFrameRates(false, videoFrameRateBackSpinner);
+        }
+
+        if (Utils.existsFrontalCamera()) {
+            loadSupportedVideoSizes(true, videoSizeFrontSpinner);
+            loadSupportedFocusModes(true, focusModeFrontSpinner);
+            loadSupportedVideoFrameRates(true, videoFrameRateFrontSpinner);
+        }
+
         if (!Utils.flashSupport.get(frontalCameraSwitch.isChecked() ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK)) {
             flashSwitch.setChecked(false);
             flashSwitch.setEnabled(false);
@@ -274,46 +340,48 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void customVideoFrameRateChanged() {
+    public void customVideoFrameRateChanged(Spinner aSpinner, Switch aSwitch) {
         // Video frame rate custom
-        videoFrameRateSpinner.setEnabled(customVideoFrameRateSwitch.isChecked());
+        aSpinner.setEnabled(aSwitch.isChecked());
     }
 
     public void customCaptureFrameRateChanged() {
         // Si se especifica modo time lapse, entonces desactivar el sonido
         captureFrameRateSpinner.setEnabled(customCaptureFrameRateSwitch.isChecked());
         recordAudioSwitch.setEnabled(!customCaptureFrameRateSwitch.isChecked());
-        customVideoFrameRateSwitch.setChecked(customCaptureFrameRateSwitch.isChecked());
+        customVideoFrameRateBackSwitch.setChecked(customCaptureFrameRateSwitch.isChecked());
+        customVideoFrameRateFrontSwitch.setChecked(customCaptureFrameRateSwitch.isChecked());
         if (customCaptureFrameRateSwitch.isChecked()) {
             recordAudioSwitch.setChecked(false);
         }
     }
 
     /** Carga el spinner de opciones de tamaño de grabacion */
-    protected void loadSupportedVideoSizes(boolean frontalCam) {
+    protected void loadSupportedVideoSizes(boolean frontalCam, Spinner aSpinner) {
         ArrayList<String> opciones = new ArrayList<String>();
         List<Camera.Size> sizes = Utils.cameraVideoSizes.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
         for (Camera.Size size : sizes) {
             opciones.add(size.width + "x" + size.height);
         }
-        videoSizeSpinner = (Spinner)findViewById(R.id.spinner_videoSize);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
-        videoSizeSpinner.setAdapter(adapter);
+        aSpinner.setAdapter(adapter);
+
+
     }
 
     /** Carga el spinner de opciones de tamaño de grabacion */
-    protected void loadSupportedVideoFrameRates(boolean frontalCam) {
+    protected void loadSupportedVideoFrameRates(boolean frontalCam, Spinner aSpinner) {
         ArrayList<String> opciones = new ArrayList<String>();
         List<Integer> fpss = Utils.videoFrameRates.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK);
         for (Integer fps: fpss) {
             opciones.add(fps.toString());
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
-        videoFrameRateSpinner.setAdapter(adapter);
+        aSpinner.setAdapter(adapter);
     }
 
     /** Carga las opciones de foco */
-    protected void loadSupportedFocusModes(boolean frontalCam) {
+    protected void loadSupportedFocusModes(boolean frontalCam, Spinner aSpinner) {
         ArrayList<String> opciones = new ArrayList<String>();
         if (Utils.autoFocusSupport.get(frontalCam ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK)) {
             opciones.add(Constants.OPTION_FOCUS_MODE_AUTO);
@@ -322,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
         } else
             opciones.add(Constants.OPTION_FOCUS_MODE_FIXED);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( this, R.layout.spinner_item_custom, opciones);
-        focusModeSpinner.setAdapter(adapter);
+        aSpinner.setAdapter(adapter);
     }
 
     /** Carga las opciones para el modo time lapse */
@@ -345,16 +413,21 @@ public class MainActivity extends AppCompatActivity {
         frontalCameraSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_FRONT_CAMERA, false));
         recordAudioSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RECORD_AUDIO, false));
         qualitySeekBar.setProgress(preferences.getInt(Constants.PREFERENCE_QUALIY, 10));
-        customVideoFrameRateSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, false));
+        customVideoFrameRateBackSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK, false));
+        customVideoFrameRateFrontSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT, false));
         customCaptureFrameRateSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, false));
-        videoSizeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_SIZE, 0));
-        videoFrameRateSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_FRAME_RATE, 0));
+        videoSizeBackSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_SIZE_BACK, 0));
+        videoSizeFrontSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_SIZE_FRONT, 0));
+        videoFrameRateBackSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_FRAME_RATE_BACK, 0));
+        videoFrameRateFrontSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_VIDEO_FRAME_RATE_FRONT, 0));
         captureFrameRateSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_CAPTURE_FRAME_RATE, 0));
         limitSizeMBEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_SIZE, "0"));
         limitTimeSecsEditText.setText(preferences.getString(Constants.PREFERENCE_LIMIT_TIME, "0"));
         delayStartSecsEditText.setText(preferences.getString(Constants.PREFERENCE_DELAY_START, "0"));
-        focusModeSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FOCUS_MODE, 0));
+        focusModeBackSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FOCUS_MODE_BACK, 0));
+        focusModeFrontSpinner.setSelection(preferences.getInt(Constants.PREFERENCE_FOCUS_MODE_FRONT, 0));
         repeatAtLimitSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, false));
+        swapCamAtRepeatSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT, false));
         stealthModeSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_STEALTH_MODE, false));
         flashSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_USE_FLASH, false));
         status.setText(preferences.getString(Constants.PREFERENCE_STATUS_STATUS_TEXT, getString(R.string.RecordingStatusReady)));
@@ -371,17 +444,21 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
         editor.putInt(Constants.PREFERENCE_QUALIY, qualitySeekBar.getProgress());
-        editor.putBoolean(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE, customVideoFrameRateSwitch.isChecked());
+        editor.putBoolean(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK, customVideoFrameRateBackSwitch.isChecked());
+        editor.putBoolean(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT, customVideoFrameRateFrontSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked());
-        editor.putInt(Constants.PREFERENCE_VIDEO_SIZE, videoSizeSpinner.getSelectedItemPosition());
-        editor.putInt(Constants.PREFERENCE_VIDEO_FRAME_RATE, videoFrameRateSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_VIDEO_SIZE_BACK, videoSizeBackSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_VIDEO_SIZE_FRONT, videoSizeFrontSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_VIDEO_FRAME_RATE_BACK, videoFrameRateBackSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_VIDEO_FRAME_RATE_FRONT, videoFrameRateFrontSpinner.getSelectedItemPosition());
         editor.putInt(Constants.PREFERENCE_CAPTURE_FRAME_RATE, captureFrameRateSpinner.getSelectedItemPosition());
         editor.putString(Constants.PREFERENCE_LIMIT_SIZE, limitSizeMBEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_LIMIT_TIME, limitTimeSecsEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_DELAY_START, delayStartSecsEditText.getText().toString());
-        editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItemPosition());
-        editor.putInt(Constants.PREFERENCE_FOCUS_MODE, focusModeSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_FOCUS_MODE_BACK, focusModeBackSpinner.getSelectedItemPosition());
+        editor.putInt(Constants.PREFERENCE_FOCUS_MODE_FRONT, focusModeFrontSpinner.getSelectedItemPosition());
         editor.putBoolean(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
+        editor.putBoolean(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT, swapCamAtRepeatSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked());
         editor.putString(Constants.PREFERENCE_STATUS_STATUS_TEXT, status.getText().toString());
@@ -408,7 +485,10 @@ public class MainActivity extends AppCompatActivity {
         if (delayStartSecsEditText.getText().length()==0) {
             return "Must specify delay start (or 0 for no delay)";
         }
-        if (customCaptureFrameRateSwitch.isChecked() && Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()) > Integer.parseInt(videoFrameRateSpinner.getSelectedItem().toString())) {
+        if (customCaptureFrameRateSwitch.isChecked() &&
+                (Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()) > Integer.parseInt(videoFrameRateBackSpinner.getSelectedItem().toString()) ||
+                 Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()) > Integer.parseInt(videoFrameRateFrontSpinner.getSelectedItem().toString())))
+        {
             return "Capture frame rate must be lower or equal to video frame rate";
         }
         return null;

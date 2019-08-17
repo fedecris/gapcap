@@ -31,6 +31,8 @@ public class Utils {
     public static HashMap<Integer, List<Integer>> videoFrameRates = new HashMap<Integer, List<Integer>>();
     // Soporte Autofocus
     public static HashMap<Integer, Boolean> autoFocusSupport = new HashMap<Integer, Boolean>();
+    // Modos de autofocus
+    public static HashMap<Integer, List<String>> focusModes = new HashMap<Integer, List<String>>();
     // Soporte Flash
     public static HashMap<Integer, Boolean> flashSupport = new HashMap<Integer, Boolean>();
     //  Previous ringer mode
@@ -108,7 +110,7 @@ public class Utils {
         featuresRetrieved = true;
 
         // == BACK CAMERA ==
-        if (existsFrontalCamera()) {
+        if (existsBackCamera()) {
             Camera cam = Camera.open();
             Camera.Parameters params = cam.getParameters();
             // Video sizes
@@ -119,6 +121,7 @@ public class Utils {
             List<String> supportedFocusModes = cam.getParameters().getSupportedFocusModes();
             boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
             autoFocusSupport.put(Camera.CameraInfo.CAMERA_FACING_BACK, hasAutoFocus);
+            focusModes.put(Camera.CameraInfo.CAMERA_FACING_BACK, supportedFocusModes);
             // Flash
             flashSupport.put(Camera.CameraInfo.CAMERA_FACING_BACK, params.getSupportedFlashModes() == null || params.getSupportedFlashModes().size() == 1 ? false : true);
             cam.release();
@@ -136,6 +139,7 @@ public class Utils {
             List<String> supportedFocusModes = cam.getParameters().getSupportedFocusModes();
             boolean hasAutoFocus = (supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO));
             autoFocusSupport.put(Camera.CameraInfo.CAMERA_FACING_FRONT, hasAutoFocus);
+            focusModes.put(Camera.CameraInfo.CAMERA_FACING_FRONT, supportedFocusModes);
             // Flash
             flashSupport.put(Camera.CameraInfo.CAMERA_FACING_FRONT, params.getSupportedFlashModes() == null || params.getSupportedFlashModes().size() == 1 ? false : true);
             cam.release();
@@ -193,6 +197,7 @@ public class Utils {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>( context, R.layout.spinner_item_custom, opciones);
         spinner.setAdapter(adapter);
     }
+
 
 }
 

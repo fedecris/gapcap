@@ -12,6 +12,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
+import java.lang.reflect.Array;
+
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED;
 import static android.media.MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED;
 
@@ -41,20 +43,30 @@ public class RecorderService extends Service {
     boolean recordAudio = true;
     // Low quality
     int quality = 10;
-    // Video Frame rate
-    boolean customVideoFrameRate = false;
-    int videoFrameRate = 30;
-    // Capture Frame rate
+    // Video Frame rate back
+    boolean customVideoFrameRateBack = false;
+    // Video Frame rate back
+    boolean customVideoFrameRateFront = false;
+    // Video Frame Rate back
+    int videoFrameRateBack = 30;
+    // Video Frame Rate front
+    int videoFrameRateFront = 30;
+    // Custom Capture Frame rate
     boolean customCaptureFrameRate = false;
+    // Capture frame rate
     int captureFrameRate = 30;
     // Limit File Size
     int limitSizeMB = 0;
     // Limit Record Time
     int limitTimeSecs = 0;
-    // Vide size
-    String videoSize = "640x480";
-    // Focus mode
-    String focusMode = "Auto";
+    // Vide size back
+    String videoSizeBack = "640x480";
+    // Vide size front
+    String videoSizeFront = "640x480";
+    // Focus mode back
+    String focusModeBack = "Auto";
+    // Focus mode front
+    String focusModeFront = "Auto";
     // File path
     String filePath;
     // File prefix
@@ -63,6 +75,8 @@ public class RecorderService extends Service {
     String fileDateFormat;
     // Repeat at limit
     boolean repeatAtLimit;
+    // Repeat at limit
+    boolean swapCamAtRepeat;
     // Stealth
     boolean stealthMode;
     // Flash?
@@ -94,18 +108,23 @@ public class RecorderService extends Service {
                 frontalCamera = (Boolean)extras.get(Constants.PREFERENCE_FRONT_CAMERA);
                 recordAudio = (Boolean)extras.get(Constants.PREFERENCE_RECORD_AUDIO);
                 quality = (Integer)extras.get(Constants.PREFERENCE_QUALIY);
-                customVideoFrameRate = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE);
-                videoFrameRate = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE);
+                customVideoFrameRateBack = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK);
+                customVideoFrameRateFront = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT);
+                videoFrameRateBack = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE_BACK);
+                videoFrameRateFront = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE_FRONT);
                 customCaptureFrameRate = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE);
                 captureFrameRate = (Integer)extras.get(Constants.PREFERENCE_CAPTURE_FRAME_RATE);
                 limitSizeMB = (Integer)extras.get(Constants.PREFERENCE_LIMIT_SIZE);
                 limitTimeSecs = (Integer)extras.get(Constants.PREFERENCE_LIMIT_TIME);
-                videoSize = (String)extras.get(Constants.PREFERENCE_VIDEO_SIZE);
-                focusMode =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE);
+                videoSizeBack = (String)extras.get(Constants.PREFERENCE_VIDEO_SIZE_BACK);
+                videoSizeFront = (String)extras.get(Constants.PREFERENCE_VIDEO_SIZE_FRONT);
+                focusModeBack =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE_BACK);
+                focusModeFront =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE_FRONT);
                 filePath =  (String)extras.get(Constants.PREFERENCE_FILEPATH);
                 filePrefix =  (String)extras.get(Constants.PREFERENCE_FILEPREFIX);
                 fileDateFormat =  (String)extras.get(Constants.PREFERENCE_FILETIMESTAMP);
                 repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT);
+                swapCamAtRepeat = (Boolean)extras.get(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT);
                 stealthMode = (Boolean)extras.get(Constants.PREFERENCE_STEALTH_MODE);
                 useFlash = (Boolean)extras.get(Constants.PREFERENCE_USE_FLASH);
             }
@@ -129,8 +148,11 @@ public class RecorderService extends Service {
                 mServiceCamera = Camera.open();
 
             Camera.Parameters parameters = mServiceCamera.getParameters();
-            parameters.setFocusMode(getSelectedFocusMode());
-            if (useFlash) {
+            // Forzar modo de foco solo si es soportado
+            if (Utils.focusModes.get(getCurrentCamera()).contains(getSelectedFocusMode())) {
+                parameters.setFocusMode(getSelectedFocusMode());
+            }
+            if (useFlash && Utils.flashSupport.get(getCurrentCamera())) {
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
             }
             mServiceCamera.setParameters(parameters);
@@ -172,8 +194,8 @@ public class RecorderService extends Service {
             mMediaRecorder.setVideoEncodingBitRate(Constants.ENCODING_BITRATE_STEP * quality + 1);
 
             // Video frame rate
-            if (customVideoFrameRate) {
-                mMediaRecorder.setVideoFrameRate(videoFrameRate);
+            if ((!frontalCamera && customVideoFrameRateBack) || (frontalCamera && customVideoFrameRateFront)) {
+                mMediaRecorder.setVideoFrameRate(frontalCamera ? videoFrameRateFront : videoFrameRateBack);
             }
 
             // Capture frame rate (timelapse mode)
@@ -224,23 +246,31 @@ public class RecorderService extends Service {
     public void stopRecording(boolean withError , boolean respawn) {
         try {
             try {
-                mMediaRecorder.stop();
-                mMediaRecorder.reset();
-                mMediaRecorder.release();
+                if (mMediaRecorder!=null) {
+                    mMediaRecorder.stop();
+                    mMediaRecorder.reset();
+                    mMediaRecorder.release();
+                }
             } catch (Exception e) {
                 notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
             }
 
             try {
-                mServiceCamera.reconnect();
-                mServiceCamera.release();
-                mServiceCamera = null;
+                if (mServiceCamera!=null) {
+                    mServiceCamera.reconnect();
+                    mServiceCamera.release();
+                    mServiceCamera = null;
+                }
             } catch (Exception e) {
                 notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
             }
 
             // Si debe repetir, reiniciar nuevamente
             if (!withError && respawn) {
+                // Swap camera at each restart
+                if (swapCamAtRepeat && Utils.existsFrontalCamera()) {
+                    frontalCamera = !frontalCamera;
+                }
                 startRecording();
                 return;
             }
@@ -261,11 +291,13 @@ public class RecorderService extends Service {
 
     /** Retorna el tamaño de grabacion segun la seleccion del usuario */
     protected int getRecordingVideoSize(int dimension) {
+        String videoSize = (frontalCamera ? videoSizeFront : videoSizeBack);
         return Integer.parseInt(videoSize.split("x")[dimension]);
     }
 
     /** Retorna el modo de enfoque */
     protected String getSelectedFocusMode() {
+        String focusMode = (frontalCamera ? focusModeFront : focusModeBack);
         switch (focusMode) {
             case Constants.OPTION_FOCUS_MODE_AUTO:
                 return Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO;
@@ -294,5 +326,11 @@ public class RecorderService extends Service {
             e.printStackTrace();
         }
     }
+
+    /** Retorna la constante relacionada con la camara actual */
+    protected int getCurrentCamera() {
+        return frontalCamera ? Camera.CameraInfo.CAMERA_FACING_FRONT : Camera.CameraInfo.CAMERA_FACING_BACK;
+    }
+
 
 }

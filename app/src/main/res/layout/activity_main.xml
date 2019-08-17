@@ -179,13 +179,13 @@
                     android:background="?android:attr/listDivider" />
 
                 <TextView
-                    android:id="@+id/Focus_TextView"
+                    android:id="@+id/FocusBack_TextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Focus mode" />
+                    android:text="Focus mode (back camera)" />
 
                 <Spinner
-                    android:id="@+id/spinner_focus"
+                    android:id="@+id/spinner_focusBack"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
@@ -198,18 +198,54 @@
                     android:background="?android:attr/listDivider" />
 
                 <TextView
-                    android:id="@+id/videoSizetextView"
+                    android:id="@+id/videoSizetextViewBack"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Video size" />
+                    android:text="Video size (back camera)" />
 
                 <Spinner
-                    android:id="@+id/spinner_videoSize"
+                    android:id="@+id/spinner_videoSizeBack"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <View
                     android:id="@+id/divider8"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/textView_focusFront"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Focus mode (front camera)" />
+
+                <Spinner
+                    android:id="@+id/spinner_focusFront"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    android:id="@+id/divider18"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/textView2_videoSizeFront"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Video size (front camera)" />
+
+                <Spinner
+                    android:id="@+id/spinner_videoSizeFront"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    android:id="@+id/divider19"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/HorizontalDividerSeparation"
@@ -254,26 +290,27 @@
                     android:id="@+id/videoFrameRateTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Video frame rate (per second)" />
+                    android:text="Video frame rate back camera (per second)" />
 
                 <LinearLayout
-                    android:id="@+id/VIDEO_FRAME_RATE"
+                    android:id="@+id/VIDEO_FRAME_RATE_BACK"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
                     <Switch
-                        android:id="@+id/switch_customVideoFrameRate"
+                        android:id="@+id/switch_customVideoFrameRateBack"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/Custom" />
 
                     <Spinner
-                        android:id="@+id/spinner_videoFrameRate"
+                        android:id="@+id/spinner_videoFrameRateBack"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1" />
+
                 </LinearLayout>
 
                 <View
@@ -283,6 +320,33 @@
                     android:layout_marginTop="@dimen/HorizontalDividerSeparation"
                     android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
                     android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/videoFrameRateTextView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Video frame rate front camera (per second)" />
+
+                <LinearLayout
+                    android:id="@+id/VIDEO_FRAME_RATE_FRONT"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <Switch
+                        android:id="@+id/switch_customVideoFrameRateFront"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/Custom" />
+
+                    <Spinner
+                        android:id="@+id/spinner_videoFrameRateFront"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/delayStartTextView"
@@ -400,6 +464,20 @@
 
                 <View
                     android:id="@+id/divider3"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <Switch
+                    android:id="@+id/Switch_swapCamAtRepeat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Swap camera at repeat" />
+
+                <View
+                    android:id="@+id/divider17"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/HorizontalDividerSeparation"

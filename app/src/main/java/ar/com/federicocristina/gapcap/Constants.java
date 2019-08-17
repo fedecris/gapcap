@@ -44,14 +44,20 @@ class Constants {
     static final String PREFERENCE_FILEPREFIX                      = "FILE_PREFIX";
     // Shared preference: file prefix
     static final String PREFERENCE_FILETIMESTAMP                   = "FILE_TIMESTAMP";
-    // Shared preference: video size
-    static final String PREFERENCE_VIDEO_SIZE                      = "VIDEO_SIZE";
-    // Shared preference: video frame rate
-    static final String PREFERENCE_VIDEO_FRAME_RATE                = "VIDEO_FRAME_RATE";
+    // Shared preference: video size back cam
+    static final String PREFERENCE_VIDEO_SIZE_BACK                 = "VIDEO_SIZE_BACK";
+    // Shared preference: video size front cam
+    static final String PREFERENCE_VIDEO_SIZE_FRONT                = "VIDEO_SIZE_FRONT";
+    // Shared preference: video frame rate back cam
+    static final String PREFERENCE_VIDEO_FRAME_RATE_BACK           = "VIDEO_FRAME_RATE_BACK";
+    // Shared preference: video frame rate front cam
+    static final String PREFERENCE_VIDEO_FRAME_RATE_FRONT          = "VIDEO_FRAME_RATE_FRONT";
     // Shared preference: capture frame rate
     static final String PREFERENCE_CAPTURE_FRAME_RATE              = "CAPTURE_FRAME_RATE";
-    // Shared preference: custom video frame rate
-    static final String PREFERENCE_CUSTOM_VIDEO_FRAME_RATE         = "CUSTOM_VIDEO_FRAME_RATE";
+    // Shared preference: custom video frame rate back cam
+    static final String PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK    = "CUSTOM_VIDEO_FRAME_RATE_BACK";
+    // Shared preference: custom video frame rate front cam
+    static final String PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT   = "CUSTOM_VIDEO_FRAME_RATE_FRONT";
     // Shared preference: custom capture frame rate
     static final String PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE       = "CUSTOM_CAPTURE_FRAME_RATE";
     // Shared preference: limit size
@@ -60,10 +66,14 @@ class Constants {
     static final String PREFERENCE_LIMIT_TIME                      = "LIMIT_TIME";
     // Shared preference: delay start
     static final String PREFERENCE_DELAY_START                     = "DELAY_START";
-    // Shared preference: focus mode
-    static final String PREFERENCE_FOCUS_MODE                      = "FOCUS_MODE";
+    // Shared preference: focus mode back
+    static final String PREFERENCE_FOCUS_MODE_BACK                 = "FOCUS_MODE_BACK";
+    // Shared preference: focus mode front
+    static final String PREFERENCE_FOCUS_MODE_FRONT                 = "FOCUS_MODE_FRONT";
     // Shared preference: repeat at limit
     static final String PREFERENCE_REPEAT_AT_LIMIT                 = "REPEAT_AT_LIMIT";
+    // Swap cam at repeat?
+    static final String PREFERENCE_SWAP_CAM_AT_REPEAT              = "SWAP_CAM_AT_REPEAT";
     // Shared preference: Force No notifications or sound
     static final String PREFERENCE_STEALTH_MODE                    = "STEALTH_MODE";
     // Shared preference: usar flash?
