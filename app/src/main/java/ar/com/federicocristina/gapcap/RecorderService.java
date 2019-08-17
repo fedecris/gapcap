@@ -208,7 +208,7 @@ public class RecorderService extends Service {
             mMediaRecorder.setMaxDuration(limitTimeSecs*1000);
 
             // ORIENTACION DEL DISPOSITIVO
-            mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext()));
+            mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext(), frontalCamera));
 
             // OUTPUT FILE
             mMediaRecorder.setOutputFile(Utils.getRecordingFileName(filePath, filePrefix, fileDateFormat));

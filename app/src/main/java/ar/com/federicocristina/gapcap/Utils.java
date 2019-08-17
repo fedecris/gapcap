@@ -88,11 +88,11 @@ public class Utils {
     }
 
     /** Devuelve la rotacion del dispositivo en grados, a partir de la posicion inicial (horizontal, botón inferior a la derecha) */
-    public static int getRotationForPreview(Context context){
+    public static int getRotationForPreview(Context context, boolean frontal){
         final int rotation = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
         switch (rotation) {
             case Surface.ROTATION_0:    // El celular esta en modo portrait
-                return 90;
+                return 90 + (frontal ? 180 : 0);
             case Surface.ROTATION_90:   // El celular esta en modo landscape, con el boton inicio a la derecha
                 return 0;
             case Surface.ROTATION_270:  // El celular esta en modo landscape, con el boton inicio a la izquierda
