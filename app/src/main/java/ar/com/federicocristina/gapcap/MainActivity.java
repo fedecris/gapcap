@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -305,14 +306,18 @@ public class MainActivity extends AppCompatActivity {
         if (current < lastScheduled) {
             status.setText("Scheduled: " + Utils.getDateTimeFor(getString(R.string.DateTimeFormat), lastScheduled));
             startButton.setEnabled(false);
-            stopButton.setText(R.string.Cancel);
             stopButton.setEnabled(true);
+            stopButton.setText(R.string.Cancel);
         } else {
             status.setText((forceRecording != null && forceRecording) || RecorderService.mRecordingStatus ? R.string.RecordingStatusActive : R.string.RecordingStatusReady);
             stopButton.setText(R.string.Stop);
             startButton.setEnabled(forceRecording !=null ? !forceRecording : !RecorderService.mRecordingStatus);
             stopButton.setEnabled(forceRecording != null? forceRecording : RecorderService.mRecordingStatus);
         }
+        // Durante la grabacion no deberia poder modificarse la configuracion de grabacion
+        LinearLayout layout = findViewById(R.id.layout_modifiers);
+        layout.setVisibility(stopButton.isEnabled() ? View.GONE : View.VISIBLE);
+
         customCaptureFrameRateChanged();
         customVideoFrameRateChanged(videoFrameRateBackSpinner, customVideoFrameRateBackSwitch);
         customVideoFrameRateChanged(videoFrameRateFrontSpinner, customVideoFrameRateFrontSwitch);
