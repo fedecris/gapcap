@@ -1,16 +1,25 @@
 package ar.com.federicocristina.gapcap;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.renderscript.RenderScript;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import java.lang.reflect.Array;
 
@@ -104,35 +113,37 @@ public class RecorderService extends Service {
                 throw new Exception("Failed to start service");
             } else {
                 messenger =  (Messenger)extras.get(Constants.MESSENGER);
-                delayStartSecs = (Integer)extras.get(Constants.PREFERENCE_DELAY_START);
-                frontalCamera = (Boolean)extras.get(Constants.PREFERENCE_FRONT_CAMERA);
-                recordAudio = (Boolean)extras.get(Constants.PREFERENCE_RECORD_AUDIO);
-                quality = (Integer)extras.get(Constants.PREFERENCE_QUALIY);
-                customVideoFrameRateBack = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK);
-                customVideoFrameRateFront = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT);
-                videoFrameRateBack = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE_BACK);
-                videoFrameRateFront = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE_FRONT);
-                customCaptureFrameRate = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE);
-                captureFrameRate = (Integer)extras.get(Constants.PREFERENCE_CAPTURE_FRAME_RATE);
-                limitSizeMB = (Integer)extras.get(Constants.PREFERENCE_LIMIT_SIZE);
-                limitTimeSecs = (Integer)extras.get(Constants.PREFERENCE_LIMIT_TIME);
-                videoSizeBack = (String)extras.get(Constants.PREFERENCE_VIDEO_SIZE_BACK);
-                videoSizeFront = (String)extras.get(Constants.PREFERENCE_VIDEO_SIZE_FRONT);
-                focusModeBack =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE_BACK);
-                focusModeFront =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE_FRONT);
-                filePath =  (String)extras.get(Constants.PREFERENCE_FILEPATH);
-                filePrefix =  (String)extras.get(Constants.PREFERENCE_FILEPREFIX);
-                fileDateFormat =  (String)extras.get(Constants.PREFERENCE_FILETIMESTAMP);
-                repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT);
-                swapCamAtRepeat = (Boolean)extras.get(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT);
-                stealthMode = (Boolean)extras.get(Constants.PREFERENCE_STEALTH_MODE);
-                useFlash = (Boolean)extras.get(Constants.PREFERENCE_USE_FLASH);
+                try { delayStartSecs = (Integer)extras.get(Constants.PREFERENCE_DELAY_START); } catch (Exception e) { /* Ignore */ }
+                try { frontalCamera = (Boolean)extras.get(Constants.PREFERENCE_FRONT_CAMERA); } catch (Exception e) { /* Ignore */ }
+                try { recordAudio = (Boolean)extras.get(Constants.PREFERENCE_RECORD_AUDIO); } catch (Exception e) { /* Ignore */ }
+                try { quality = (Integer)extras.get(Constants.PREFERENCE_QUALIY); } catch (Exception e) { /* Ignore */ }
+                try { customVideoFrameRateBack = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK); } catch (Exception e) { /* Ignore */ }
+                try { customVideoFrameRateFront = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT); } catch (Exception e) { /* Ignore */ }
+                try { videoFrameRateBack = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE_BACK); } catch (Exception e) { /* Ignore */ }
+                try { videoFrameRateFront = (Integer)extras.get(Constants.PREFERENCE_VIDEO_FRAME_RATE_FRONT); } catch (Exception e) { /* Ignore */ }
+                try { customCaptureFrameRate = (Boolean)extras.get(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE); } catch (Exception e) { /* Ignore */ }
+                try { captureFrameRate = (Integer)extras.get(Constants.PREFERENCE_CAPTURE_FRAME_RATE); } catch (Exception e) { /* Ignore */ }
+                try { limitSizeMB = (Integer)extras.get(Constants.PREFERENCE_LIMIT_SIZE); } catch (Exception e) { /* Ignore */ }
+                try { limitTimeSecs = (Integer)extras.get(Constants.PREFERENCE_LIMIT_TIME); } catch (Exception e) { /* Ignore */ }
+                try { videoSizeBack = (String)extras.get(Constants.PREFERENCE_VIDEO_SIZE_BACK); } catch (Exception e) { /* Ignore */ }
+                try { videoSizeFront = (String)extras.get(Constants.PREFERENCE_VIDEO_SIZE_FRONT); } catch (Exception e) { /* Ignore */ }
+                try { focusModeBack =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE_BACK); } catch (Exception e) { /* Ignore */ }
+                try { focusModeFront =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE_FRONT); } catch (Exception e) { /* Ignore */ }
+                try { filePath =  (String)extras.get(Constants.PREFERENCE_FILEPATH); } catch (Exception e) { /* Ignore */ }
+                try { filePrefix =  (String)extras.get(Constants.PREFERENCE_FILEPREFIX); } catch (Exception e) { /* Ignore */ }
+                try { fileDateFormat =  (String)extras.get(Constants.PREFERENCE_FILETIMESTAMP); } catch (Exception e) { /* Ignore */ }
+                try { repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT); } catch (Exception e) { /* Ignore */ }
+                try { swapCamAtRepeat = (Boolean)extras.get(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT); } catch (Exception e) { /* Ignore */ }
+                try { stealthMode = (Boolean)extras.get(Constants.PREFERENCE_STEALTH_MODE); } catch (Exception e) { /* Ignore */ }
+                try { useFlash = (Boolean)extras.get(Constants.PREFERENCE_USE_FLASH); } catch (Exception e) { /* Ignore */ }
             }
             if (mRecordingStatus == false)
                 mRecordingStatus = startRecording();
         } catch (RuntimeException e) {
+            e.printStackTrace();
             notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
         } catch (Exception e2) {
+            e2.printStackTrace();
             notifyEvent(Constants.NOTIFY_ERROR, e2.getMessage());
         }
 
@@ -224,19 +235,50 @@ public class RecorderService extends Service {
             notifyEvent(Constants.NOTIFY_START, null);
 
             // Inicio del servicio
-            Notification note=new Notification();
-            startForeground(id, note);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForeground();
+            } else {
+                Notification note=new Notification();
+                startForeground(id, note);
+            }
 
             return true;
         } catch (RuntimeException e2) {
+            e2.printStackTrace();
             notifyEvent(Constants.NOTIFY_ERROR, e2.getMessage());
             stopRecording(true);
             return false;
          } catch (Exception e) {
+            e.printStackTrace();
             notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
             stopRecording(true);
             return false;
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void startForeground() {
+        String channelId = createNotificationChannel("my_service", "My Background Service");
+
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId );
+        // NotificationCompat. notification = notificationBuilder.setOngoing(true);
+        notificationBuilder.setOngoing(true);
+        notificationBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        notificationBuilder.setPriority(NotificationManager.IMPORTANCE_DEFAULT);
+        notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
+        notificationBuilder.build();
+        Notification notification = notificationBuilder.build();
+        startForeground(101, notification);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private String createNotificationChannel(String channelId, String channelName) {
+        NotificationChannel chan = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE);
+        chan.setLightColor(Color.BLUE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        NotificationManager service = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        service.createNotificationChannel(chan);
+        return channelId;
     }
 
     public void stopRecording(boolean withError) {
@@ -252,6 +294,7 @@ public class RecorderService extends Service {
                     mMediaRecorder.release();
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
             }
 
@@ -262,6 +305,7 @@ public class RecorderService extends Service {
                     mServiceCamera = null;
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
             }
 
@@ -282,8 +326,10 @@ public class RecorderService extends Service {
                 Utils.muteNotificationSounds(getBaseContext(), false);
             }
         } catch (RuntimeException e2) {
+            e2.printStackTrace();
             notifyEvent(Constants.NOTIFY_ERROR, e2.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             notifyEvent(Constants.NOTIFY_ERROR, e.getMessage());
         }
 

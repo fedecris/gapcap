@@ -207,29 +207,29 @@ public class MainActivity extends AppCompatActivity {
         Intent alarmIntent = new Intent(this, RecorderService.class);
         alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         alarmIntent.putExtra(Constants.MESSENGER, messenger);
-        alarmIntent.putExtra(Constants.PREFERENCE_DELAY_START, Integer.parseInt(delayStartSecsEditText.getText().toString()));
-        alarmIntent.putExtra(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_QUALIY, qualitySeekBar.getProgress());
-        alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK, customVideoFrameRateBackSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT, customVideoFrameRateFrontSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE_BACK, Integer.parseInt(videoFrameRateBackSpinner.getSelectedItem().toString()));
-        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE_FRONT, Integer.parseInt(videoFrameRateFrontSpinner.getSelectedItem().toString()));
-        alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_CAPTURE_FRAME_RATE, Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString()));
-        alarmIntent.putExtra(Constants.PREFERENCE_LIMIT_SIZE, Integer.parseInt(limitSizeMBEditText.getText().toString()));
-        alarmIntent.putExtra(Constants.PREFERENCE_LIMIT_TIME, Integer.parseInt(limitTimeSecsEditText.getText().toString()));
-        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_SIZE_BACK, videoSizeBackSpinner.getSelectedItem().toString());
-        alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_SIZE_FRONT, videoSizeFrontSpinner.getSelectedItem().toString());
-        alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE_BACK, focusModeBackSpinner.getSelectedItem().toString());
-        alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE_FRONT, focusModeFrontSpinner.getSelectedItem().toString());
-        alarmIntent.putExtra(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
-        alarmIntent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
-        alarmIntent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
-        alarmIntent.putExtra(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT, swapCamAtRepeatSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked());
-        alarmIntent.putExtra(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked());
+        try { alarmIntent.putExtra(Constants.PREFERENCE_DELAY_START, Integer.parseInt(delayStartSecsEditText.getText().toString())); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_RECORD_AUDIO, recordAudioSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_QUALIY, qualitySeekBar.getProgress()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_BACK, customVideoFrameRateBackSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_VIDEO_FRAME_RATE_FRONT, customVideoFrameRateFrontSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE_BACK, Integer.parseInt(videoFrameRateBackSpinner.getSelectedItem().toString())); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_FRAME_RATE_FRONT, Integer.parseInt(videoFrameRateFrontSpinner.getSelectedItem().toString())); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_CUSTOM_CAPTURE_FRAME_RATE, customCaptureFrameRateSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_CAPTURE_FRAME_RATE, Integer.parseInt(captureFrameRateSpinner.getSelectedItem().toString())); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_LIMIT_SIZE, Integer.parseInt(limitSizeMBEditText.getText().toString())); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_LIMIT_TIME, Integer.parseInt(limitTimeSecsEditText.getText().toString())); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_SIZE_BACK, videoSizeBackSpinner.getSelectedItem().toString()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_VIDEO_SIZE_FRONT, videoSizeFrontSpinner.getSelectedItem().toString()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE_BACK, focusModeBackSpinner.getSelectedItem().toString()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE_FRONT, focusModeFrontSpinner.getSelectedItem().toString()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT, swapCamAtRepeatSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_STEALTH_MODE, stealthModeSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
 
 
         // Programar el inicio del servicio de grabacion, o bien iniciar inmediatamente
