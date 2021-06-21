@@ -107,10 +107,11 @@ public class RecorderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStart(intent, startId);
         try {
-
+            if (intent==null)
+                return START_STICKY;
             Bundle extras = intent.getExtras();
             if (extras == null) {
-                throw new Exception("Failed to start service");
+                return START_STICKY;
             } else {
                 messenger =  (Messenger)extras.get(Constants.MESSENGER);
                 try { delayStartSecs = (Integer)extras.get(Constants.PREFERENCE_DELAY_START); } catch (Exception e) { /* Ignore */ }
@@ -264,7 +265,7 @@ public class RecorderService extends Service {
         // NotificationCompat. notification = notificationBuilder.setOngoing(true);
         notificationBuilder.setOngoing(true);
         notificationBuilder.setSmallIcon(R.mipmap.ic_launcher);
-        notificationBuilder.setPriority(NotificationManager.IMPORTANCE_DEFAULT);
+        notificationBuilder.setPriority(NotificationManager.IMPORTANCE_MAX);
         notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
         notificationBuilder.build();
         Notification notification = notificationBuilder.build();

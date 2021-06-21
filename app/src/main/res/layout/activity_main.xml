@@ -82,6 +82,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:height="40dp"
+                    android:checked="false"
+                    android:clickable="false"
                     android:text="Run in background" />
 
                 <View

@@ -232,24 +232,21 @@ public class MainActivity extends AppCompatActivity {
         try { alarmIntent.putExtra(Constants.PREFERENCE_USE_FLASH, flashSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
 
 
-        // Programar el inicio del servicio de grabacion, o bien iniciar inmediatamente
-        if (Integer.parseInt(delayStartSecsEditText.getText().toString()) > 0) {
-            lastScheduled = System.currentTimeMillis() + Integer.parseInt(delayStartSecsEditText.getText().toString()) * 1000;
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            pendingIntent = PendingIntent.getService(this, 1, alarmIntent, 0);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, lastScheduled, pendingIntent);
-            updateComponentsStatus();
-        } else {
-            lastScheduled = 0;
-            ComponentName ret = startService(alarmIntent);
-            ret.getClassName();
-            updateComponentsStatus(true);
+        // Programar el inicio del servicio de grabacion, o bien iniciar de inmediato
+        // Se quita la posibilidad de iniciar en background para minimizar las posibilidades de kill,
+        // pasando siempre el inicio del servicio por el AlarmManager
+        int delayStart;
+        try {
+            delayStart = Integer.parseInt(delayStartSecsEditText.getText().toString());
+        } catch (Exception e) {
+            delayStart = 1;
         }
 
-        // Finalizar la actividad si corresponde
-        if (runInBackgroundSwitch.isChecked()) {
-            finish();
-        }
+        lastScheduled = System.currentTimeMillis() + delayStart * 1000;
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        pendingIntent = PendingIntent.getService(this, 1, alarmIntent, 0);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, lastScheduled, pendingIntent);
+        updateComponentsStatus();
     }
 
     /** Sobrecarga */
