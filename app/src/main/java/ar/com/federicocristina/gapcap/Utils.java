@@ -51,7 +51,7 @@ public class Utils {
 
     /** Ubicacions de la grabacion */
     public static String getRecordingFileName(String filePath, String filePrefix, String dateFormat) {
-        String retValue = Environment.getExternalStorageDirectory().getPath() + File.separator + filePath + File.separator +  filePrefix + Utils.getDateTime(dateFormat) + ".mp4";
+        String retValue = /*Environment.getExternalStorageDirectory().getPath() + File.separator + */ filePath + File.separator +  filePrefix + Utils.getDateTime(dateFormat) + ".mp4";
         // Quitar dobles slashes
         retValue = retValue.replace("//", "/");
         return retValue;
@@ -149,7 +149,7 @@ public class Utils {
     /** Verifica si existe el path especificado en donde almacenar la grabacion */
     public static boolean recordingPathExists(String path) {
         try {
-            File f = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + path);
+            File f = new File(/* Environment.getExternalStorageDirectory().getPath() + File.separator + */ path);
             return f.isDirectory();
         } catch (Exception e) {
             return false;
