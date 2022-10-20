@@ -42,6 +42,8 @@ class Constants {
     static final String PREFERENCE_FILEPATH                        = "FILE_PATH";
     // Shared preference: file prefix
     static final String PREFERENCE_FILEPREFIX                      = "FILE_PREFIX";
+    // Shared preference: file extension
+    static final String PREFERENCE_FILEEXT                         = "FILE_EXT";
     // Shared preference: file prefix
     static final String PREFERENCE_FILETIMESTAMP                   = "FILE_TIMESTAMP";
     // Shared preference: video size back cam

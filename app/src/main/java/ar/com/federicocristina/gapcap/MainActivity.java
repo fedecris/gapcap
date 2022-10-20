@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     public EditText filePathEditText;
     // Path de grabacion
     public EditText filePrefixEditText;
+    // Extension del archivo
+    public EditText fileExtEditText;
     // Timestamp del archivo
     public EditText fileDateFormatEditText;
     // Camara frontal?
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         runInBackgroundSwitch = findViewById(R.id.switch_toBackground);
         filePathEditText = findViewById(R.id.editText_path);
         filePrefixEditText = findViewById(R.id.editText_filePrefix);
+        fileExtEditText = findViewById(R.id.editText_fileExt);
         fileDateFormatEditText = findViewById(R.id.editText_filenameTimestamp);
         qualitySeekBar = findViewById(R.id.seekBar_quality);
         recordAudioSwitch = findViewById(R.id.switch_audio);
@@ -225,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
         try { alarmIntent.putExtra(Constants.PREFERENCE_FOCUS_MODE_FRONT, focusModeFrontSpinner.getSelectedItem().toString()); } catch (Exception e) { /* Ignore */ }
         try { alarmIntent.putExtra(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString()); } catch (Exception e) { /* Ignore */ }
         try { alarmIntent.putExtra(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString()); } catch (Exception e) { /* Ignore */ }
+        try { alarmIntent.putExtra(Constants.PREFERENCE_FILEEXT, fileExtEditText.getText().toString()); } catch (Exception e) { /* Ignore */ }
         try { alarmIntent.putExtra(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString()); } catch (Exception e) { /* Ignore */ }
         try { alarmIntent.putExtra(Constants.PREFERENCE_REPEAT_AT_LIMIT, repeatAtLimitSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
         try { alarmIntent.putExtra(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT, swapCamAtRepeatSwitch.isChecked()); } catch (Exception e) { /* Ignore */ }
@@ -409,7 +413,8 @@ public class MainActivity extends AppCompatActivity {
     protected void loadSharedPreferences() {
         SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         filePathEditText.setText(preferences.getString(Constants.PREFERENCE_FILEPATH, "Specify a path to save the files"));
-        filePrefixEditText.setText(preferences.getString(Constants.PREFERENCE_FILEPREFIX, "Specify a file prefix (optional)"));
+        filePrefixEditText.setText(preferences.getString(Constants.PREFERENCE_FILEPREFIX, "pref_"));
+        fileExtEditText.setText(preferences.getString(Constants.PREFERENCE_FILEEXT, ".mp4"));
         fileDateFormatEditText.setText(preferences.getString(Constants.PREFERENCE_FILETIMESTAMP, "yyyyMMdd_HHmmss"));
         runInBackgroundSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_RUNINBACKGROUND, true));
         frontalCameraSwitch.setChecked(preferences.getBoolean(Constants.PREFERENCE_FRONT_CAMERA, false));
@@ -441,6 +446,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(Constants.PREFERENCE_FILEPATH, filePathEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_FILEPREFIX, filePrefixEditText.getText().toString());
+        editor.putString(Constants.PREFERENCE_FILEEXT, fileExtEditText.getText().toString());
         editor.putString(Constants.PREFERENCE_FILETIMESTAMP, fileDateFormatEditText.getText().toString());
         editor.putBoolean(Constants.PREFERENCE_RUNINBACKGROUND, runInBackgroundSwitch.isChecked());
         editor.putBoolean(Constants.PREFERENCE_FRONT_CAMERA, frontalCameraSwitch.isChecked());

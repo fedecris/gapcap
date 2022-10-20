@@ -50,8 +50,10 @@ public class Utils {
     }
 
     /** Ubicacions de la grabacion */
-    public static String getRecordingFileName(String filePath, String filePrefix, String dateFormat) {
-        String retValue = /*Environment.getExternalStorageDirectory().getPath() + File.separator + */ filePath + File.separator +  filePrefix + Utils.getDateTime(dateFormat) + ".mp4";
+    public static String getRecordingFileName(String filePath, String filePrefix, String dateFormat, String fileExt) {
+        String ext = (fileExt != null && fileExt.length() > 0 ? fileExt : "mp4").replace(".", "").replace(" ", "");
+        String pref = (filePrefix != null && filePrefix.length() > 0 ? filePrefix : "").replace(" ", "");
+        String retValue = /*Environment.getExternalStorageDirectory().getPath() + File.separator + */ filePath + File.separator +  pref + Utils.getDateTime(dateFormat) + "." + ext;
         // Quitar dobles slashes
         retValue = retValue.replace("//", "/");
         return retValue;

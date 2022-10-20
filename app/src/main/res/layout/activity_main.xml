@@ -526,6 +526,28 @@
                     android:inputType="textPersonName" />
 
                 <View
+                    android:id="@+id/divider20"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/HorizontalDividerSeparation"
+                    android:layout_marginBottom="@dimen/HorizontalDividerSeparation"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView
+                    android:id="@+id/FileExtView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Filename extension" />
+
+                <EditText
+                    android:id="@+id/editText_fileExt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:ems="10"
+                    android:inputType="textPersonName" />
+
+                <View
                     android:id="@+id/divider14"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"

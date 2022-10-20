@@ -80,6 +80,8 @@ public class RecorderService extends Service {
     String filePath;
     // File prefix
     String filePrefix;
+    // File prefix
+    String fileExt;
     // File date format
     String fileDateFormat;
     // Repeat at limit
@@ -132,6 +134,7 @@ public class RecorderService extends Service {
                 try { focusModeFront =  (String)extras.get(Constants.PREFERENCE_FOCUS_MODE_FRONT); } catch (Exception e) { /* Ignore */ }
                 try { filePath =  (String)extras.get(Constants.PREFERENCE_FILEPATH); } catch (Exception e) { /* Ignore */ }
                 try { filePrefix =  (String)extras.get(Constants.PREFERENCE_FILEPREFIX); } catch (Exception e) { /* Ignore */ }
+                try { fileExt =  (String)extras.get(Constants.PREFERENCE_FILEEXT); } catch (Exception e) { /* Ignore */ }
                 try { fileDateFormat =  (String)extras.get(Constants.PREFERENCE_FILETIMESTAMP); } catch (Exception e) { /* Ignore */ }
                 try { repeatAtLimit = (Boolean)extras.get(Constants.PREFERENCE_REPEAT_AT_LIMIT); } catch (Exception e) { /* Ignore */ }
                 try { swapCamAtRepeat = (Boolean)extras.get(Constants.PREFERENCE_SWAP_CAM_AT_REPEAT); } catch (Exception e) { /* Ignore */ }
@@ -223,7 +226,7 @@ public class RecorderService extends Service {
             mMediaRecorder.setOrientationHint(Utils.getRotationForPreview(getBaseContext(), frontalCamera));
 
             // OUTPUT FILE
-            mMediaRecorder.setOutputFile(Utils.getRecordingFileName(filePath, filePrefix, fileDateFormat));
+            mMediaRecorder.setOutputFile(Utils.getRecordingFileName(filePath, filePrefix, fileDateFormat, fileExt));
 
             // START RECORDING
             if (stealthMode) {
